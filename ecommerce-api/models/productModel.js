@@ -47,6 +47,23 @@ const productSchema = mongoose.Schema({
     }
 })
 
+productSchema.pre('save', async function (next) {
+    try {
+        const reviews = await mongoose.model('Review').find({ _id: { $in: this.reviews } });
+
+        if (reviews.length > 0) {
+            const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+            this.averageRating = totalRating / reviews.length;
+        } else {
+            this.averageRating = 0;
+        }
+
+        next();
+    } catch (error) {
+        next(error);
+    }
+});
+
 
 const Product = mongoose.model('Product',productSchema)
 

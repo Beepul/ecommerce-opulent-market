@@ -24,8 +24,11 @@ const orderSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['Pending', 'Processing', 'Shipped', 'Delivered'],
-    default: 'Pending'
+    enum: {
+      values: ['pending', 'processing', 'shipped', 'delivered'],
+      message: 'Please provide a valid status'
+    },
+    default: 'pending'
   },
   shippingAddress: {
     type: mongoose.Schema.Types.ObjectId,

@@ -4,7 +4,28 @@ const Category = require('../models/categoryModel')
 
 // GET ALL PRODUCTS
 const getAllProducts = asyncHandler(async (req,res) => {
-    const products = await Product.find()
+    let query = {}
+
+    // filtering by category
+    if(req.query.category){
+        const categoryIds = req.query.category.split(',')
+        query.category = {$in: categoryIds}
+    }
+
+    // filtering by price range
+    if(req.query.minPrice && req.query.maxPrice){
+        query.price = {$gte: parseFloat(req.query.minPrice), $lte: parseFloat(req.query.maxPrice)}
+    }
+    
+    // Sorting by price name rating sac desc
+    let sortOptions = {}
+
+    if(req.query.sortBy){
+        const parts = req.query.sortBy.split(':')
+        sortOptions[parts[0]] = parts[1] === 'desc' ? -1 : 1
+    }
+    
+    const products = await Product.find(query).sort(sortOptions).populate("category").populate("reviews")
     if(products.length <= 0){
         res.status(400)
         throw new Error("No products has been created yet")
@@ -19,7 +40,7 @@ const getAllProducts = asyncHandler(async (req,res) => {
 const getProduct = asyncHandler(async (req,res) => {
     const {id} = req.params
 
-    const product = await Product.findById(id)
+    const product = await Product.findById(id).populate('category').populate('reviews')
 
     if(product){
         res.status(200).json({

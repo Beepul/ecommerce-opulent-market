@@ -3,7 +3,7 @@ const Category = require('../models/categoryModel')
 
 // GET ALL CATEGORY
 const getAllCategory = asyncHandler(async (req,res) => {
-    const category = await Category.find()
+    const category = await Category.find().populate("children").populate("parent")
     if(category){
         res.status(200).json({
             category,
@@ -19,7 +19,7 @@ const getAllCategory = asyncHandler(async (req,res) => {
 const getCategory = asyncHandler(async (req,res) => {
     const {id} = req.params
 
-    const category = await Category.findById(id)
+    const category = await Category.findById(id).populate("children").populate("parent")
     if(category){
         res.status(200).json({
             category,

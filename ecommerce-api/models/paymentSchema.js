@@ -12,7 +12,7 @@ const paymentSchema = mongoose.Schema({
   paymentMethod: {
     type: String,
     enum: {
-      values: ['Cash', 'Online'],
+      values: ['cash', 'online'],
       message: 'Payment method must be either "Cash" or "Online"',
     },
     required: true

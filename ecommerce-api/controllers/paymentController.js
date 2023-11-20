@@ -23,7 +23,7 @@ const createPayment = asyncHandler(async (req,res) => {
         throw new Error('All fields required')
     }
 
-    if(paymentMethod === 'Cash'){
+    if(paymentMethod === 'cash'){
         res.status(400)
         throw new Error('Cash on delivery is not accepted at the moment, Please try using Online payment.')
     }
@@ -37,7 +37,7 @@ const createPayment = asyncHandler(async (req,res) => {
     
     let details = {}
 
-    if(paymentMethod === 'Online'){
+    if(paymentMethod === 'online'){
         if(!amount){
             res.status(400)
             throw new Error('Amount is required')
