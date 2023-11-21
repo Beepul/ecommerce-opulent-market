@@ -25,7 +25,9 @@ const addressSchema = mongoose.Schema({
   country: {
     type: String,
     required: true
-  },
+  }
+},{
+  timestamps: true
 });
 
 const Address = mongoose.model('Address', addressSchema);

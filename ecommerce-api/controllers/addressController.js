@@ -2,14 +2,56 @@ const asyncHandler = require('express-async-handler')
 const User = require('../models/userModel')
 const Address = require('../models/addressModel')
 
+
+// Get all address
 const getAllUserAddress = asyncHandler(async (req,res)=>{
-    res.send("All Address")
+
+    const addresses = await Address.find().populate({
+        path: 'user',
+        select: '-password'
+    })
+
+    if(!addresses || addresses.length <= 0){
+        res.status(400)
+        throw new Error('No Address found')
+    }
+
+    res.status(200).json({
+        message: 'success',
+        addresses
+    })
 })
 
+
+// Get user address
 const getUserAddress = asyncHandler(async (req,res) => {
-    res.send("User Address")
+    const {userId} = req.params
+
+    const user = await User.findById(userId)
+
+    if(!user){
+        res.status(400)
+        throw new Error('User does not exist')
+    }
+
+    const address = await Address.find({user: userId}).populate({
+        path: 'user',
+        select: '-password'
+    })
+
+    if(!address || address.length <= 0){
+        res.status(400)
+        throw new Error(`No address found of user ${userId}`)
+    }
+
+    res.status(200).json({
+        message: 'success',
+        address
+    })
+
 })
 
+// Create new Address
 const createUserAddress = asyncHandler(async (req,res) => {
     const {userId} = req.params
     const {street,city,state,postalCode,country} = req.body
@@ -29,6 +71,12 @@ const createUserAddress = asyncHandler(async (req,res) => {
     if(!user){
         res.status(400)
         throw new Error('User does not exist')
+    }
+
+    const addressExist = await Address.find({user: userId})
+
+    if(addressExist.length >=1 || addressExist){
+        await Address.deleteMany({user: userId})
     }
 
     const address = await Address.create({
@@ -52,12 +100,71 @@ const createUserAddress = asyncHandler(async (req,res) => {
 
 })
 
+// Update address
 const updateUserAddress = asyncHandler(async (req,res) => {
-    res.send("Update User Address")
+    const {userId,addressId} = req.params
+    const {street,city,state,postalCode,country} = req.body
+
+    let address = await Address.findById(addressId)
+
+    if(!address){
+        res.status(400)
+        throw new Error('Address not found')
+    }
+
+    if(userId !== address.user.toString()){
+        res.status(401)
+        throw new Error('User and the address author doesnot match')
+    }
+
+    address.street = street || address.street 
+    address.city = city || address.city 
+    address.state = state || address.state 
+    address.postalCode = postalCode || address.postalCode
+    address.country = country || address.country
+
+    await address.save()
+
+    if(!address){
+        res.status(400)
+        throw new Error('Address not found')
+    }
+
+    res.status(200).json({
+        message: 'success',
+        address
+    })
+
+
 })
 
 const deleteUserAddress = asyncHandler(async (req,res) => {
-    res.send("Delete users address")
+    const {userId,addressId} = req.params
+
+    const user = await User.findById(userId)
+
+    if(!user){
+        res.status(404)
+        throw new Error('User doesnot exits')
+    }
+
+    const address = await Address.findById(addressId)
+
+    if(!address){
+        res.status(404)
+        throw new Error('Address not found')
+    }
+
+    if(user._id.toString() !== address.user.toString()){
+        res.status(401)
+        throw new Error('user doesnot match with this address')
+    }
+
+    await Address.findByIdAndDelete(address._id)
+
+    res.status(200).json({
+        message: 'success'
+    })
 })
 
 module.exports = {

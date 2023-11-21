@@ -4,11 +4,11 @@ const { getAllUserAddress, getUserAddress, createUserAddress, updateUserAddress,
 const router = express.Router()
 
 
-router.get('/address',getAllUserAddress)
-router.get('/:userId/address',getUserAddress)
-router.post('/:userId/address', createUserAddress)
-router.put('/:userId/address/:addressId', updateUserAddress)
-router.delete('/:userId/address/:addressId', deleteUserAddress)
+router.get('/',getAllUserAddress)
+router.get('/:userId',getUserAddress)
+router.post('/:userId', createUserAddress)
+router.put('/:userId/:addressId', updateUserAddress)
+router.delete('/:userId/:addressId', deleteUserAddress)
 
 
 

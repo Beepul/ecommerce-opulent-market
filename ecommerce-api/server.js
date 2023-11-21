@@ -39,7 +39,7 @@ app.use('/api/categories', categoryRoute)
 app.use('/api/orders', orderRoute)
 app.use('/api/products', reviewRoute)
 app.use('/api/user',userRoute)
-app.use('/api/user',addressRoute)
+app.use('/api/address',addressRoute)
 app.use('/api/user',paymentRoute)
 app.use('/api/admin/stats', statsRoute)
 
