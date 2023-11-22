@@ -16,6 +16,8 @@ const userRoute = require('./routes/userRoute')
 const addressRoute = require('./routes/addressRoute')
 const paymentRoute = require('./routes/paymentRoute')
 const statsRoute = require('./routes/statsRoute')
+const fileUpload = require('express-fileupload')
+const cloudinary = require('./config/cloudinary')
 
 
 
@@ -32,6 +34,12 @@ app.use(logger())
 app.use(cors(corsOptions))
 app.use(express.json())
 app.use(cookieParser())
+
+app.use(fileUpload({
+    useTempFiles: true
+}))
+
+app.use(cloudinary)
 
 app.use('/api/auth', authRoute)
 app.use('/api/products', productRoute)

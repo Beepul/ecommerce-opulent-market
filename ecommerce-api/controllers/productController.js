@@ -1,6 +1,12 @@
 const asyncHandler = require('express-async-handler')
 const Product = require('../models/productModel')
-const Category = require('../models/categoryModel')
+const Category = require('../models/categoryModel');
+const imageUploader = require('../utils/imageUploader');
+const cloudinary = require('cloudinary').v2
+
+
+const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+
 
 // GET ALL PRODUCTS
 const getAllProducts = asyncHandler(async (req,res) => {
@@ -55,8 +61,12 @@ const getProduct = asyncHandler(async (req,res) => {
 })
 
 // Create New Product
+
 const createProduct = asyncHandler(async (req,res) => {
-    const {name,description,price,image,stockQuantity,category} = req.body
+
+    const image = req.files.image
+    const {name,description,price,stockQuantity,category} = req.body
+    const categories = category.split(',')
 
     if(!name || !description || !image || !category){
         res.status(400)
@@ -71,25 +81,33 @@ const createProduct = asyncHandler(async (req,res) => {
         res.status(400);
         throw new Error("Stock must be a valid number greater than 0");
     }
-
-    if (category.length === 0) {
+    
+    if (categories.length === 0) {
         res.status(400);
         throw new Error("At least one category must be selected");
     }
-    const existingCategory = await Category.find({_id:{$in: category}})
+    
+    const existingCategory = await Category.find({_id:{$in: categories}})
 
-    if(existingCategory.length !== category.length){
+    if(existingCategory.length !== categories.length){
         res.status(400)
         throw new Error("One or more categories do not exist")
+    }
+
+    const uploadedImage = await imageUploader(image)
+    
+    if(!uploadedImage){
+        res.status(400)
+        throw new Error('Failed to upload image')
     }
 
     const product = await Product.create({
         name,
         description,
         price,
-        image,
+        image: uploadedImage.url,
         stockQuantity,
-        category
+        category: categories
     })
 
     if(product){
@@ -105,8 +123,11 @@ const createProduct = asyncHandler(async (req,res) => {
 
 // Update Product
 const updateProduct = asyncHandler(async (req,res) => {
-    const {name,description,price,image,stockQuantity,category} = req.body
+
     const {id} = req.params
+    const {name,description,price,stockQuantity,category} = req.body
+    const image = req.files.image 
+    const categories = category.split(',')
 
     if (isNaN(parseFloat(price)) || !isFinite(price)) {
         res.status(400);
@@ -125,25 +146,31 @@ const updateProduct = asyncHandler(async (req,res) => {
         throw new Error(`Product with id ${id} not found`)
     }
 
+    let uploadedImage
+
+    if(image){
+        uploadedImage = await imageUploader(image)
+    }
+
     product.name = name || product.name 
     product.description = description || product.description
     product.price = price || product.price 
-    product.image = image || product.image 
     product.stockQuantity = stockQuantity || product.stockQuantity 
+    product.image = uploadedImage ? uploadedImage.url : product.image
 
-    if(category.length > 0 ){
-        const existingCategory = await Category.find({_id:{$in: category}})
+    if(categories.length > 0 ){
+        const existingCategory = await Category.find({_id:{$in: categories}})
     
-        if(existingCategory.length !== category.length || existingCategory.length <= 0){
+        if(existingCategory.length !== categories.length || existingCategory.length <= 0){
             res.status(400)
             throw new Error("One or more categories do not exist")
         }
 
-        product.category = category
+        product.category = categories
     }
 
     product = await product.save()
-
+    
     if(product){
         res.status(200).json({
             message: "success",
@@ -153,8 +180,6 @@ const updateProduct = asyncHandler(async (req,res) => {
         res.status(400)
         throw new Error("please provide valid data")
     }
-
-
 })
 
 // Delete Product
