@@ -4,12 +4,33 @@ const Payment = require('../models/paymentSchema')
 
 // GET ALL PAYMENTS
 const getAllPayments = asyncHandler(async (req,res) => {
-    res.send("All payments")
+    const paymentMethods = await Payment.find().populate('user')
+
+
+    if(!paymentMethods || paymentMethods.length <= 0){
+        res.status(400)
+        throw new Error('No payment method has been created yet')
+    }
+    res.status(200).json({
+        message: 'success',
+        paymentMethods
+    })
 })
 
 // GET Single PAYMENT
 const getPayment = asyncHandler(async (req,res) => {
-    res.send("Single payment")
+   const {userId} = req.params
+
+   const paymentMethods = await Payment.find({user: userId}).populate('user')
+
+    if(!paymentMethods || paymentMethods.length <= 0){
+        res.status(400)
+        throw new Error('No payment method has been created yet')
+    }
+    res.status(200).json({
+        message: 'success',
+        paymentMethods
+    })
 })
 
 // Create New Payment
@@ -77,12 +98,61 @@ const createPayment = asyncHandler(async (req,res) => {
 
 // Update Payment
 const updatePayment = asyncHandler(async (req,res) => {
-    res.send("Update payment")
+    const {userId,paymentId} = req.params
+    const {amount,paymentMethod} = req.body
+
+    if(paymentMethod !== 'online'){
+        res.status(400)
+        throw new Error('We only accept online payment at the moment')
+    }
+
+    const payment = await Payment.findById(paymentId)
+
+    if(!payment){
+        res.status(404)
+        throw new Error('Payment not found')
+    }
+
+    const isValidUser = payment.user.toString() === userId ? true : false 
+
+    if(!isValidUser){
+        res.status(401)
+        throw new Error('User doesnot match')
+    }
+
+    payment.amount = amount || payment.amount
+    payment.paymentMethod = paymentMethod || payment.paymentMethod
+
+    await payment.save()
+
+    res.status(200).json({
+        message: 'success',
+        payment
+    })
+
 })
 
 // Delete Payment
 const deletePayment = asyncHandler(async (req,res) => {
-    res.send("Delete payment")
+    const {userId,paymentId} = req.params
+    const payment = await Payment.findById(paymentId)
+
+    if(!payment){
+        res.status(404)
+        throw new Error('Payment not found')
+    }
+    const isValidUser = payment.user.toString() === userId ? true : false 
+
+    if(!isValidUser){
+        res.status(401)
+        throw new Error('User doesnot match')
+    }
+
+    await Payment.findByIdAndDelete(paymentId)
+
+    res.status(200).json({
+        message: `Product with id: ${paymentId} has been deleted`
+    })
 })
 
 module.exports = {

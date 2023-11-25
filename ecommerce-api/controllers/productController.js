@@ -1,11 +1,9 @@
 const asyncHandler = require('express-async-handler')
 const Product = require('../models/productModel')
 const Category = require('../models/categoryModel');
-const imageUploader = require('../utils/imageUploader');
-const cloudinary = require('cloudinary').v2
+const {imageUploader, getImagePublicId, deleteImageFromCloudinary} = require('../utils/cloudinary');
 
 
-const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png'];
 
 
 // GET ALL PRODUCTS
@@ -94,7 +92,7 @@ const createProduct = asyncHandler(async (req,res) => {
         throw new Error("One or more categories do not exist")
     }
 
-    const uploadedImage = await imageUploader(image)
+    const uploadedImage = await imageUploader(image,'Products')
     
     if(!uploadedImage){
         res.status(400)
@@ -149,7 +147,7 @@ const updateProduct = asyncHandler(async (req,res) => {
     let uploadedImage
 
     if(image){
-        uploadedImage = await imageUploader(image)
+        uploadedImage = await imageUploader(image,'Products')
     }
 
     product.name = name || product.name 
@@ -194,6 +192,19 @@ const deleteProduct = asyncHandler(async (req,res) => {
     }
 
     await Product.findByIdAndDelete(id)
+
+    const imageUrl = product.image;
+
+    // Delete the corresponding image from Cloudinary
+    if (imageUrl) {
+        const publicId = getImagePublicId(imageUrl)
+        const {result} = await deleteImageFromCloudinary(publicId,'Products')
+        if(result !== 'ok'){
+            return res.status(200).json({
+                message: `Product with id ${id} has been deleted but image was not found`
+            })
+        }
+    }
 
     res.status(200).json({
         message: `Product with id ${id} has been deleted`

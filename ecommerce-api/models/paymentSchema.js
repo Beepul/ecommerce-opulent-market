@@ -16,7 +16,7 @@ const paymentSchema = mongoose.Schema({
       message: 'Payment method must be either "Cash" or "Online"',
     },
     required: true
-  },
+  }
 });
 
 const Payment = mongoose.model('Payment', paymentSchema);

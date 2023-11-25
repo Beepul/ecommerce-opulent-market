@@ -48,7 +48,7 @@ app.use('/api/orders', orderRoute)
 app.use('/api/products', reviewRoute)
 app.use('/api/user',userRoute)
 app.use('/api/address',addressRoute)
-app.use('/api/user',paymentRoute)
+app.use('/api/payment',paymentRoute)
 app.use('/api/admin/stats', statsRoute)
 
 

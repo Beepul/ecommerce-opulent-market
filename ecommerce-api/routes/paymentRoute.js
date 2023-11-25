@@ -5,10 +5,10 @@ const router = express.Router()
 
 
 
-router.get('/payment',getAllPayments)
-router.get('/:userId/payment',getPayment)
-router.post('/:userId/payment',createPayment)
-router.put('/:userId/payment/:paymentId',updatePayment)
-router.delete('/:userId/payment/:paymentId',deletePayment)
+router.get('/',getAllPayments) 
+router.get('/:userId',getPayment) 
+router.post('/:userId',createPayment)
+router.put('/:userId/:paymentId',updatePayment)
+router.delete('/:userId/:paymentId',deletePayment)
 
 module.exports = router
