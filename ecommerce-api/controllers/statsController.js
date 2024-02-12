@@ -1,5 +1,7 @@
 const asyncHandler = require('express-async-handler');
-const Order = require('../models/orderSchema');
+const Order = require('../models/orderModel');
+const BError = require('../utils/error');
+const User = require('../models/userModel');
 
 
 const getTotalSales = asyncHandler(async (req,res) => {
@@ -32,7 +34,20 @@ const getTotalSales = asyncHandler(async (req,res) => {
     })
 })
 
-const getProfileLoss = asyncHandler(async (req,res) => {
+const getTotalUsers  = asyncHandler(async (req,res) => {
+  try {
+    const users = await User.find()
+    res.json({
+      message: 'success',
+      users,
+      userCount: users.length
+    })
+  } catch (error) {
+    throw BError(error.message || 'Error While Getting All User Count',400)
+  }
+})
+
+const getProfitLoss = asyncHandler(async (req,res) => {
     const totalSales = await Order.aggregate([
         {
           $match: {
@@ -93,7 +108,6 @@ const getProfileLoss = asyncHandler(async (req,res) => {
       // Calculate total profit or loss
       const totalProfitLoss = totalAmount - totalCost;
 
-      console.log({totalAmount,totalCost,totalProfitLoss})
     
       res.status(200).json({
         message: 'success',
@@ -139,8 +153,7 @@ const getBestSellingProduct = asyncHandler(async (req,res) => {
         {
           $project: {
             _id: 0,
-            productId: '$_id',
-            productName: '$productInfo.name',
+            product: '$productInfo',
             totalQuantitySold: 1,
           },
         },
@@ -199,10 +212,10 @@ const getTopCategoryBySales = asyncHandler(async (req,res)=>{
         },
         {
             $project: {
-              _id: 0,
-              categoryId: '$_id',
+              _id: '$categoryInfo._id',
               categoryName: '$categoryInfo.name',
               totalSales: 1,
+              categoryImage: '$categoryInfo.image'
             },
         },
       
@@ -284,9 +297,10 @@ const getMostActiveUser = asyncHandler(async (req, res) => {
 
 module.exports = {
     getTotalSales,
+    getTotalUsers,
     getBestSellingProduct,
     getCustomerLocation,
-    getProfileLoss,
+    getProfitLoss,
     getMostActiveUser,
     getTopCategoryBySales
 }

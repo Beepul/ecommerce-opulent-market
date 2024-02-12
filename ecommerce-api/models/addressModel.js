@@ -15,16 +15,28 @@ const addressSchema = mongoose.Schema({
     required: true
   },
   state: {
-    type: String,
-    required: true
+    code: {
+      type: String,
+      required: true
+    },
+    name: {
+      type: String,
+      required: true
+    }
   },
   postalCode: {
     type: String,
     required: true
   },
   country: {
-    type: String,
-    required: true
+    code: {
+      type: String,
+      required: true
+    },
+    name: {
+      type: String,
+      required: true
+    }
   }
 },{
   timestamps: true

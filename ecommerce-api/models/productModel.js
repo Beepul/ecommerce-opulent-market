@@ -8,17 +8,28 @@ const productSchema = mongoose.Schema({
     description: {
         type: String,
         required: true,
-        maxLength: [150,"Description must be less than 150 characters"]
+        maxLength: [250,"Description must be less than 250 characters"]
     },
     price: {
         type: Number,
         required: true 
     },
-    image:{
-        type: String,
-        default: "https://i.ibb.co/4pDNDk1/avatar.png",
-        required: true
+    discountPercentage: {
+        type: Number,
+        default: 0
     },
+    images: [
+        {
+          public_id: {
+            type: String,
+            required: true,
+          },
+          url: {
+            type: String,
+            required: true,
+          },
+        },
+    ],
     stockQuantity: {
         type: Number,
         required: true ,
@@ -44,7 +55,41 @@ const productSchema = mongoose.Schema({
     totalQuantitySold: {
         type: Number,
         default: 0
-    }
+    },
+    isFeatured: {
+        type: Boolean,
+        default: false,
+    },
+    offer: {
+        isOffered: {
+            type: Boolean,
+            default: false,
+        },
+        offerStartDate: {
+            type: Date,
+            default: null,
+            validate: {
+                validator: function (value) {
+                    return !this.isOffered || !this.offerEndDate || value < this.offerEndDate;
+                },
+                message: 'Offer start date must be before the end date.',
+            },
+        },
+        offerEndDate: {
+            type: Date,
+            default: null,
+            offerEndDate: {
+                type: Date,
+                default: null,
+                validate: {
+                    validator: function (value) {
+                        return !this.isOffered || !this.offerStartDate || value > new Date();
+                    },
+                    message: 'Offer end date must be in the future.',
+                },
+            }
+        }
+    }    
 })
 
 productSchema.pre('save', async function (next) {

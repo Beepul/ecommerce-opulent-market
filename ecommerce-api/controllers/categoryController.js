@@ -1,19 +1,34 @@
 const asyncHandler = require('express-async-handler')
 const Category = require('../models/categoryModel')
+const cloudinary = require('cloudinary')
+const Product = require('../models/productModel');
+const { deleteImageFromCloudinary } = require('../utils/cloudinary');
+const BError = require('../utils/error');
 
 // GET ALL CATEGORY
-const getAllCategory = asyncHandler(async (req,res) => {
-    const category = await Category.find().populate("children").populate("parent")
-    if(category){
+const getAllCategory = asyncHandler(async (req, res) => {
+    try {
+        // Retrieve all categories
+        const categories = await Category.find();
+
+        const newCategories = await Promise.all(categories.map(async (cat) => {
+            const productCount = await Product.countDocuments({ category: cat._id });
+            cat = cat.toObject(); 
+            cat.count = productCount || 0;
+            return cat;
+        }));
+
         res.status(200).json({
-            category,
+            categories: newCategories,
+            total: newCategories.length,
             message: "success"
-        })
-    }else{
-        res.status(400)
-        throw new Error("Something went wrong")
+        });
+
+    } catch (error) {
+        throw new BError(error.message || "Internal Server Error", 400)
     }
-})
+});
+
 
 // GET Single CATEGORY
 const getCategory = asyncHandler(async (req,res) => {
@@ -26,127 +41,97 @@ const getCategory = asyncHandler(async (req,res) => {
             message: "success"
         })
     }else{
-        res.status(400)
-        throw new Error("Something went wrong")
+        throw new BError("Category not found",404)
     }
 })
 
 // Create New Category
 const createCategory = asyncHandler(async (req,res) => {
-    const {name,parent} = req.body 
-    if(!name){
-        res.status(400)
-        throw new Error("Category is required")
+    const {name,image} = req.body 
+
+    if(!name || !image){
+        throw new BError("All Feilds Required",400)
     }
+
     const existingCategory = await Category.findOne({ name });
 
     if (existingCategory) {
-        res.status(400);
-        throw new Error("Category with the same name already exists");
-    }
-    // Check if the parent category exists
-    let parentCategory = null;
-    if (parent) {
-        parentCategory = await Category.findById(parent);
-        if (!parentCategory) {
-            return res.status(400).json({ message: 'Parent category not found' });
-        }
+        throw new BError("Category with the same name already exists",400);
     }
 
-    // Create a new category
-    const newCategory = new Category({
+    const imageResult = await cloudinary.v2.uploader.upload(image, {
+        folder: 'seven-shop'
+    })
+
+    // // Create a new category
+    const category = await Category.create({
         name,
-        parent: parentCategory ? parentCategory._id : null,
-        children: [],
+        image: {
+            public_id: imageResult.public_id,
+            url: imageResult.url
+        }
     });
 
-    // Save the new category to the database
-    await newCategory.save();
-
-    // If a parent category exists, update its children array
-    if (parentCategory) {
-        parentCategory.children.push(newCategory._id);
-        await parentCategory.save();
-    }
-
-    // Send a success response
-    res.status(201).json({ message: "success", category: newCategory });
+    // // Send a success response
+    res.status(201).json({ message: "success", category });
 
 })
 
 // Update Category
 const updateCategory = asyncHandler(async (req,res) => {
+
     const {id} = req.params
-    const {name,parent,children} = req.body 
+    const {name,image,oldImageId} = req.body 
 
-    if(!name){
-        res.status(400)
-        throw new Error("Name of category is required")
+    if(!name || !image ){
+        throw new BError("All Feilds Required",400)
     }
 
-    const existingCategory = await Category.find({name})
-
-    if(existingCategory.length < 0){
-        res.status(400)
-        throw new Error("Category name already exist")
-    }
-
+    
     let category = await Category.findById(id);
+
     if (!category) {
-        res.status(400)
-        throw new Error("Category not found")
+        throw new BError("Category not found",400)
     }
 
-    // If a new parent is provided, update the parent's children array
-    if (parent && parent.toString() !== category.parent.toString()) {
-        const oldParentCategory = await Category.findById(category.parent);
-        const newParentCategory = await Category.findById(parent);
-
-        if (oldParentCategory) {
-            oldParentCategory.children = oldParentCategory.children.filter(childId => childId.toString() !== id);
-            await oldParentCategory.save();
+    if(image && image.public_id){
+        category.name = name
+        category.image = category.image
+    }else{
+        if(oldImageId){
+            await cloudinary.v2.uploader.destroy(oldImageId)
         }
-
-        if (newParentCategory) {
-            newParentCategory.children.push(id);
-            await newParentCategory.save();
+        const imageResult = await cloudinary.v2.uploader.upload(image, {
+            folder: 'seven-shop'
+        })
+        category.name = name 
+        category.image = {
+            public_id: imageResult.public_id,
+            url: imageResult.url,
         }
     }
 
-    // Update the category
-    category.name = name || category.name;
-    category.parent = parent || category.parent;
-    category.children = children || category.children;
+    await category.save()
 
-    await category.save();
-
-    // Send a success response
-    res.status(200).json({ message:"success", category });
+    res.status(200).json({
+        message: 'success',
+        category
+    })
 
 })
 
 // Delete Category
 const deleteCategory = asyncHandler(async (req,res) => {
     const {id} = req.params
+
     const existingCategory = await Category.findById(id)
+
     if(!existingCategory){
-        res.status(400)
-        throw new Error("category donot exist")
+        throw new BError("category donot exist",400)
     }
 
-    let parentCategory = null
+    await cloudinary.v2.uploader.destroy(existingCategory.image.public_id)
 
-    if(existingCategory.parent){
-        parentCategory = await Category.findById(existingCategory.parent)
-        if(parentCategory){
-            parentCategory.children = parentCategory.children.filter(childId => {
-                return childId.toString() !== id
-            })
-            await parentCategory.save()
-        }
-    }
-
-    await Category.updateMany({ parent: id }, { $set: { parent: null } });
     await Category.findByIdAndDelete(id)
 
     res.status(200).json({

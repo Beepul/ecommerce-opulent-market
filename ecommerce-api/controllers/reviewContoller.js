@@ -2,6 +2,8 @@ const asyncHandler = require('express-async-handler')
 const Product = require('../models/productModel')
 const Review = require('../models/reviewModel')
 const User = require('../models/userModel')
+const Order = require('../models/orderModel')
+const BError = require('../utils/error')
 
 const getReview = asyncHandler(async (req,res) => {
     const {productId} = req.params
@@ -9,8 +11,7 @@ const getReview = asyncHandler(async (req,res) => {
     const product = await Product.findById(productId).populate('reviews');
 
     if(!product){
-        res.status(400)
-        throw new Error(`Product with id ${id} not found`)
+        throw new BError(`Product with id ${id} not found`,400)
     }
 
     const reviews = product.reviews;
@@ -20,64 +21,76 @@ const getReview = asyncHandler(async (req,res) => {
     })
 })
 
-const createReview = asyncHandler(async (req,res) => {
-    const {productId} = req.params
-    const {user,rating,content} = req.body
+const createReview = asyncHandler(async (req, res) => {
+    const { productId } = req.params;
+    const user = req.userId;
+    const { rating, content } = req.body;
 
-    if(!user || !rating || !content || !productId){
-        res.status(400)
-        throw new Error('Please provide all the field')
+    if (!rating || !content || !productId) {
+        throw new BError('Please provide all the fields', 400);
     }
 
     if (isNaN(parseFloat(rating)) || !isFinite(rating)) {
-        res.status(400);
-        throw new Error("Rating must be a valid number");
+        throw new BError('Rating must be a valid number',400);
     }
 
-    if(parseFloat(rating) < 1 || parseFloat(rating) > 5){
-        res.status(400)
-        throw new Error('Rating must be between 1 to 5')
+    if (parseFloat(rating) < 1 || parseFloat(rating) > 5) {
+        throw new BError('Rating must be between 1 to 5',400);
     }
 
-    const userExist = await User.findById(user)
+    const orders = await Order.find({ user, status: 'delivered' });
+    
 
-    if(!userExist){
-        res.status(400)
-        throw new Error(`User not found with id ${user}`)
+    let hasPurchased = false;
+
+
+    for (const order of orders) {
+        const items = order.items;
+
+        for (const item of items) {
+            if (item.product.toString() === productId) {
+                hasPurchased = true;
+                break;
+            }
+        }
+
+        if (hasPurchased) {
+            break;
+        }
     }
 
-    let product = await Product.findById(productId)
 
-    if(!product){
-        res.status(400)
-        throw new Error(`Product not found with id ${productId}`)
+    if (!hasPurchased) {
+        throw new BError('You must purchase the product in order to review it.',400);
     }
 
+    const product = await Product.findById(productId).populate('reviews');
+
+    if (!product) {
+        throw new BError(`Product not found with id ${productId}`,404);
+    }
+
+    const reviewExist = product.reviews.find((item) => item.user.toString() === user)
+    
+    if(reviewExist){
+        throw new BError('You have already reviewed this product! Cannot review twice.', 400)
+    }
+    
     const review = await Review.create({
         user,
         rating,
         content,
-        product: product._id
-    })
+        product: product._id,
+    });
 
-    if(!review){
-        res.status(400)
-        throw new Error('Please provide valid data')
-    }
+    product.reviews.push(review._id);
+    product.save();
 
-    product.reviews.push(review._id)
-    product.save()
-
-    if(product && review){
-        res.status(201).json({
-            message: "success",
-            review
-        })
-    }else{
-        res.status(400)
-        throw new Error('Please provide valid data')
-    }
-})
+    res.status(201).json({
+        message: 'success',
+        review,
+    });
+});
 
 
 module.exports = {

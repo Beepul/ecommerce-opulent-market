@@ -2,13 +2,19 @@ const asyncHandler = require('express-async-handler')
 const Product = require('../models/productModel')
 const Category = require('../models/categoryModel');
 const {imageUploader, getImagePublicId, deleteImageFromCloudinary} = require('../utils/cloudinary');
-
+const cloudinary = require('cloudinary')
+const BError = require('../utils/error')
 
 
 
 // GET ALL PRODUCTS
 const getAllProducts = asyncHandler(async (req,res) => {
     let query = {}
+
+
+    const page = parseInt(req.query.page) || 1;
+    const perPage = parseInt(req.query.perPage) || 5;
+    const skip = (page - 1) * perPage;
 
     // filtering by category
     if(req.query.category){
@@ -20,6 +26,17 @@ const getAllProducts = asyncHandler(async (req,res) => {
     if(req.query.minPrice && req.query.maxPrice){
         query.price = {$gte: parseFloat(req.query.minPrice), $lte: parseFloat(req.query.maxPrice)}
     }
+
+    // Filtering by rating
+    if (req.query.rating) {
+        const rating = parseFloat(req.query.rating);
+        query.averageRating = { $gte: rating }
+    }
+
+    // Adding search by name functionality
+    if (req.query.search) {
+        query.name = { $regex: new RegExp(req.query.search, 'i') };
+    }
     
     // Sorting by price name rating sac desc
     let sortOptions = {}
@@ -29,14 +46,38 @@ const getAllProducts = asyncHandler(async (req,res) => {
         sortOptions[parts[0]] = parts[1] === 'desc' ? -1 : 1
     }
     
-    const products = await Product.find(query).sort(sortOptions).populate("category").populate("reviews")
-    if(products.length <= 0){
-        res.status(400)
-        throw new Error("No products has been created yet")
-    }
+    const products = await Product.find(query)
+        .sort(sortOptions)
+        .skip(skip)
+        .limit(perPage)
+        .populate("category")
+        .populate("reviews")
+
+    const count = await Product.countDocuments(query);
+
+    const minMaxPrices = await Product.aggregate([
+        {
+            $group: {
+                _id: null,
+                minPrice: { $min: "$price" },
+                maxPrice: { $max: "$price" }
+            }
+        },
+        {
+            $sort: { _id: 1 }
+        }
+    ]);
+
+    const { minPrice, maxPrice } = minMaxPrices[0];
+
+    
+ 
     res.status(200).json({
         message: "success",
-        products
+        products,
+        count,
+        minPrice,
+        maxPrice
     })
 })
 
@@ -44,7 +85,12 @@ const getAllProducts = asyncHandler(async (req,res) => {
 const getProduct = asyncHandler(async (req,res) => {
     const {id} = req.params
 
-    const product = await Product.findById(id).populate('category').populate('reviews')
+    const product = await Product.findById(id)
+        .populate('category')
+        .populate({
+            path: 'reviews',
+            populate: {path: 'user', select: '_id name email pic'}
+        })
 
     if(product){
         res.status(200).json({
@@ -53,7 +99,7 @@ const getProduct = asyncHandler(async (req,res) => {
         })
     }else{
         res.status(400)
-        throw new Error("Product not available")
+        throw new BError("Product not available")
     }
 
 })
@@ -62,51 +108,68 @@ const getProduct = asyncHandler(async (req,res) => {
 
 const createProduct = asyncHandler(async (req,res) => {
 
-    const image = req.files.image
-    const {name,description,price,stockQuantity,category} = req.body
-    const categories = category.split(',')
+    const {name,description,price,discountPercentage,stockQuantity,category,isFeatured,offer} = req.body
 
-    if(!name || !description || !image || !category){
-        res.status(400)
-        throw new Error("All fields required")
+    if(!name || !description || !category || category.length <= 0){
+        throw new BError("All fields required",400)
+    }
+    if(!req.body.images || req.body.images.length <= 0 ){
+        throw new BError("Please select an image",400)
     }
     if (isNaN(parseFloat(price)) || !isFinite(price)) {
-        res.status(400);
-        throw new Error("Price must be a valid number");
+        throw new BError("Price must be a valid number",400);
     }
 
     if (isNaN(parseFloat(stockQuantity)) || !isFinite(stockQuantity) || stockQuantity <= 0) {
-        res.status(400);
-        throw new Error("Stock must be a valid number greater than 0");
-    }
-    
-    if (categories.length === 0) {
-        res.status(400);
-        throw new Error("At least one category must be selected");
-    }
-    
-    const existingCategory = await Category.find({_id:{$in: categories}})
-
-    if(existingCategory.length !== categories.length){
-        res.status(400)
-        throw new Error("One or more categories do not exist")
+        throw new BError("Stock must be a valid number greater than 0",400);
     }
 
-    const uploadedImage = await imageUploader(image,'Products')
+  
     
-    if(!uploadedImage){
-        res.status(400)
-        throw new Error('Failed to upload image')
+    const existingCategory = await Category.find({_id:{$in: category}})
+
+   
+
+    if(existingCategory.length !== category.length){
+        throw new BError("One or more categories do not exist",400)
     }
 
-    const product = await Product.create({
+    
+
+    let images = []
+
+    if(typeof req.body.images === 'string'){
+        images.push(req.body.images)
+    }else{
+        images = req.body.images
+    }
+    
+    const imageLinks = []
+
+    for(let i = 0; i < images.length ; i++){
+        const result = await cloudinary.v2.uploader.upload(images[i], {
+            folder: 'seven-shop'
+        })
+
+        imageLinks.push({
+            public_id: result.public_id,
+            url: result.url
+        })
+    }
+
+    let productData = {
         name,
         description,
         price,
-        image: uploadedImage.url,
+        discountPercentage,
+        images: imageLinks,
         stockQuantity,
-        category: categories
-    })
+        category,
+        isFeatured,
+        offer
+    }
+
+    const product = await Product.create(productData)
 
     if(product){
         res.status(201).json({
@@ -114,8 +177,7 @@ const createProduct = asyncHandler(async (req,res) => {
             message: "Product created sucessfully"
         })
     }else{
-        res.status(400)
-        throw new Error("Please provide valid data")
+        throw new BError("Please provide valid data",400)
     }
 })
 
@@ -123,92 +185,104 @@ const createProduct = asyncHandler(async (req,res) => {
 const updateProduct = asyncHandler(async (req,res) => {
 
     const {id} = req.params
-    const {name,description,price,stockQuantity,category} = req.body
-    const image = req.files.image 
-    const categories = category.split(',')
 
+    const {name,description,price,discountPercentage,images,stockQuantity,category,isFeatured,offer,oldImages} = req.body
+
+    if(!name || !description || !category || category.length <= 0){
+        throw new BError("All fields required",400)
+    }
+    if(!req.body.images || req.body.images.length <= 0 ){
+        throw new BError("Please select an image",400)
+    }
     if (isNaN(parseFloat(price)) || !isFinite(price)) {
-        res.status(400);
-        throw new Error("Price must be a valid number");
+        throw new BError("Price must be a valid number",400);
     }
 
     if (isNaN(parseFloat(stockQuantity)) || !isFinite(stockQuantity) || stockQuantity <= 0) {
-        res.status(400);
-        throw new Error("Stock must be a valid number greater than 0");
+        throw new BError("Stock must be a valid number greater than 0",400);
     }
 
     let product = await Product.findById(id)
 
     if(!product){
-        res.status(400)
-        throw new Error(`Product with id ${id} not found`)
+        throw new BError(`Product with id ${id} not found`, 400)
     }
 
-    let uploadedImage
 
-    if(image){
-        uploadedImage = await imageUploader(image,'Products')
+    if(images && images[0].public_id){
+        product.images = images
+    }else {
+        if(oldImages && oldImages.length > 0){
+            for (const img of images){
+                await cloudinary.v2.uploader.destroy(img)
+            }
+        }
+        const newImages = []
+        if(images && images.length > 0){
+            for(const img of images){
+                const imageResult = await cloudinary.v2.uploader.upload(img,{
+                    folder: 'seven-shop'
+                })
+                newImages.push({
+                    public_id: imageResult.public_id,
+                    url: imageResult.url
+                })
+            }
+        }
+        product.images = newImages
     }
 
     product.name = name || product.name 
     product.description = description || product.description
-    product.price = price || product.price 
-    product.stockQuantity = stockQuantity || product.stockQuantity 
-    product.image = uploadedImage ? uploadedImage.url : product.image
+    product.price = price || product.price
+    product.discountPercentage = discountPercentage || product.discountPercentage
+    product.stockQuantity = stockQuantity || product.stockQuantity
+    product.category = category || product.category
+    product.isFeatured = isFeatured || product.isFeatured
+    product.offer = {
+        isOffered: offer?.isOffered || product.offer.isOffered,
+        offerStartDate: offer?.offerStartDate || product.offer.offerStartDate,
+        offerEndDate: offer?.offerEndDate || product.offer.offerEndDate,
+    } 
 
-    if(categories.length > 0 ){
-        const existingCategory = await Category.find({_id:{$in: categories}})
-    
-        if(existingCategory.length !== categories.length || existingCategory.length <= 0){
-            res.status(400)
-            throw new Error("One or more categories do not exist")
-        }
+    await product.save()
 
-        product.category = categories
-    }
-
-    product = await product.save()
-    
-    if(product){
-        res.status(200).json({
-            message: "success",
-            product
-        })
-    }else{
-        res.status(400)
-        throw new Error("please provide valid data")
-    }
+    res.status(200).json({
+        message: 'success',
+        product
+    })
 })
 
 // Delete Product
 const deleteProduct = asyncHandler(async (req,res) => {
-    const {id} = req.params
-
-    const product = await Product.findById(id)
-
-    if(!product){
-        res.status(400)
-        throw new Error(`Product not found with id ${id}`)
-    }
-
-    await Product.findByIdAndDelete(id)
-
-    const imageUrl = product.image;
-
-    // Delete the corresponding image from Cloudinary
-    if (imageUrl) {
-        const publicId = getImagePublicId(imageUrl)
-        const {result} = await deleteImageFromCloudinary(publicId,'Products')
-        if(result !== 'ok'){
-            return res.status(200).json({
-                message: `Product with id ${id} has been deleted but image was not found`
-            })
+    try {
+        const {id} = req.params
+    
+        const product = await Product.findById(id)
+    
+        if(!product){
+            throw new BError(`Product not found with id ${id}`,400)
         }
-    }
 
-    res.status(200).json({
-        message: `Product with id ${id} has been deleted`
-    })
+        const public_ids = []
+
+        for(const img of product?.images){
+            public_ids.push(img.public_id)
+        }
+    
+        for (const public_id of public_ids){
+            const result = await cloudinary.v2.uploader.destroy(public_id)
+            console.log("RESULT::", result)
+        }
+    
+        await Product.findByIdAndDelete(id)
+    
+        res.status(200).json({
+            message: `Product with id ${id} has been deleted`
+        })
+    } catch (error) {
+        throw new BError(error.message || 'Internal Server Error', 400)
+    }
 })
 
 module.exports = {

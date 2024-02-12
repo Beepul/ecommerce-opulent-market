@@ -1,59 +1,50 @@
 const asyncHandler = require('express-async-handler')
 const Address = require('../models/addressModel')
-const Payment = require('../models/paymentSchema')
-const Order = require('../models/orderSchema')
-const Product = require('../models/productModel')
-const {
-    checkConsistency,
-    updateProductStock,
-    validateAddressAndPayment,
-    validateOrderInput,
-    validateProductStock
-} = require('../utils/orderUtils')
+const Order = require('../models/orderModel')
+const Product = require('../models/productModel');
+const User = require('../models/userModel');
+const BError = require('../utils/error');
+
+
+
+
+const validateProductStock = async (items,res) => {
+    for (const item of items) {
+        const product = await Product.findById(item._id);
+
+        if (!product || product.stockQuantity < item.quantity) {
+            throw new BError(`Insufficient stock for ${product.name}`, 400);
+        }
+    }
+};
+
+const updateProductStock = async (items) => {
+    for (const item of items) {
+        const product = await Product.findById(item._id);
+        product.stockQuantity -= item.quantity;
+        await product.save();
+    }
+};
+
 
 // GET ALL ORDERS
 const getAllOrders = asyncHandler(async (req,res) => {
     let query = {}
 
-    // Filtering by user
     if(req.query.user){
         query.user = req.query.user
     }
 
-    // Filtering by status
-    if(req.query.status){
-        query.status = req.query.status
-    }
-
-    // Filtering by date range
-    if (req.query.startDate && req.query.endDate) {
-        query.createdAt = {
-          $gte: new Date(req.query.startDate),
-          $lte: new Date(req.query.endDate),
-        };
-    }
-
-    // Sorting
-    let sortOptions = {}
-
-    if(req.query.sortBy){
-        const parts = req.query.sortBy.split(':')
-        sortOptions[parts[0]] = parts[1] === 'desc' ? -1 : 1
-    }
-
-    const orders = await Order.find(query).sort(sortOptions).populate('shippingAddress').populate("paymentDetails").populate({
-        path: 'items.product',
-        model: 'Product'
-    })
-
-    if(orders.length <= 0){
-        res.status(300)
-        throw new Error('No Orders has been made')
-    }else{
+    try {
+        const orders = await Order.find(query).populate('user','-password').populate({path: 'items.product', populate: {path: 'category'}}).populate('shippingAddress')
+        
         res.status(200).json({
-            message: "success",
+            message: 'success',
             orders
         })
+        
+    } catch (error) {
+        throw new BError(error.message || 'Cannot get orders', 400)
     }
 })
 
@@ -61,14 +52,13 @@ const getAllOrders = asyncHandler(async (req,res) => {
 const getOrder = asyncHandler(async (req,res) => {
     const {id} = req.params 
 
-    const order = await Order.findById(id).populate('shippingAddress').populate("paymentDetails").populate({
+    const order = await Order.findById(id).populate('shippingAddress').populate({
         path: 'items.product',
-        model: 'Product', // Replace with the actual model name for the Product
+        model: 'Product', 
     });
 
     if(!order){
-        res.status(400)
-        throw new Error('Order not found')
+        throw new BError('Order not found',404)
     }
 
     res.status(200).json({
@@ -79,84 +69,92 @@ const getOrder = asyncHandler(async (req,res) => {
 
 // Create New Order
 const createOrder = asyncHandler(async (req, res) => {
-    const { user, items, shippingAddress, paymentDetails } = req.body;
-
     try {
-        validateOrderInput(user, items, shippingAddress, paymentDetails);
-
-        const { address, payment } = await validateAddressAndPayment(shippingAddress, paymentDetails);
-
-        // Check if userId matches the one associated with the addressId and paymentId
-        const isConsistent = await checkConsistency(user, address._id, payment._id);
-
-        if (!isConsistent) {
-            throw new Error("Inconsistent user information");
+        const user = req.userId 
+        const {items , totalPrice  , shippingAddress } = req.body
+    
+        if(items.length <= 0){
+            throw new BError('Product in your order is missing',400)
         }
-
-        await validateProductStock(items);
-
-        const productIds = items.map(item => item.product);
-        const products = await Product.find({ _id: { $in: productIds } });
-
-        const totalPrice = items.reduce((total, item) => {
-            const product = products.find(p => p._id.equals(item.product));
-            return total + product.price * item.quantity;
-        }, 0);
-
+    
+        for (const item of items) {
+            if (item.quantity <= 0) {
+                throw new BError('Please increase the quantity of the product to purchase',400);
+            }
+        }
+    
+        const address = await Address.findById(shippingAddress)
+    
+        if(!address){
+            throw new BError('Invalid shipping address',400)
+        }
+    
+        await validateProductStock(items,res);
+    
         const order = await Order.create({
             user,
-            items,
-            shippingAddress: address._id,
-            paymentDetails: payment._id,
-            totalPrice
-        });
-
+            items: items.map((item) => {
+                return {
+                    product: item._id,
+                    quantity: item.quantity
+                }
+            }),
+            totalPrice,
+            status: 'processing',
+            shippingAddress,
+            paymentDetails: {
+                paymentMethod: 'cash',
+                paymentStatus: 'due'
+            },
+        })
+    
         await updateProductStock(items);
-
-        res.status(200).json({
-            message: "success",
+        
+        res.status(201).json({
+            message: 'success',
             order
-        });
+        })
+        
     } catch (error) {
-        console.error(error);
-        res.status(400).json({ success: false, error: error.message });
+        throw new BError(error.message || 'Cannot create Order', 400)        
     }
+
 });
 
 // Update Order
 const updateOrder = asyncHandler(async (req,res) => {
     const {id} = req.params 
-    const {user,status,shippingAddress,paymentDetails} = req.body
-
-    if(!user){
-        res.status(400)
-        throw new Error('All fields required')
-    }
-
-    let order = await Order.findById(id)
-
-    if(!order){
-        res.status(404)
-        throw new Error('Order not found')
-    }
-
-    const isValidUser = user === order.user.toString() ? true : false 
-
-    if(!isValidUser){
-        res.status(401)
-        throw new Error('user doesnot match with this order')
-    }
-
-    order.status = status || order.status 
-    order.shippingAddress = shippingAddress || order.shippingAddress
-    order.paymentDetails = paymentDetails || order.paymentDetails
+    const {user,status,paymentDetails,deliveredAt} = req.body
+    try {
+        const existUser = await User.findById(user)
+        let order = await Order.findById(id)
     
-    await order.save()
+        if(!order){
+            res.status(400)
+            throw new BError('Order does not exist')
+        }
+    
+        if(order.user.toString() !== existUser._id.toString()){
+            res.status(400)
+            throw new BError(`This order does not belogs to user you've provided `)
+        }
+        
+        order.status = status || order.status
+        order.paymentDetails.paymentMethod = paymentDetails.paymentMethod ? paymentDetails.paymentMethod : order.paymentDetails.paymentMethod
+        order.paymentDetails.paymentStatus = paymentDetails.paymentStatus ? paymentDetails.paymentStatus : order.paymentDetails.paymentStatus
+        order.deliveredAt = deliveredAt || order.deliveredAt
+    
+        await order.save()
+    
+        res.status(200).json({
+            message: "success",
+            order: order
+        })
+        
+    } catch (error) {
+        throw new BError(error.message || 'Failed to update order', 400)
+    }
 
-    res.status(200).json({
-        message: "success",
-        order: order
-    })
 })
 
 // Delete Order
@@ -166,8 +164,7 @@ const deleteOrder = asyncHandler(async (req,res) => {
     const order = await Order.findById(id)
 
     if(!order){
-        res.status(400)
-        throw new Error('Order not found')
+        throw new BError('Order not found',404)
     }
 
     order.items.forEach( async (item) => {
@@ -181,8 +178,7 @@ const deleteOrder = asyncHandler(async (req,res) => {
     const deletedOrder = await Order.findByIdAndDelete(id)
 
     if(!deletedOrder){
-        res.status(404)
-        throw new Error('Order not found')
+        throw new BError('Order not found',404)
     }
 
     res.status(200).json({

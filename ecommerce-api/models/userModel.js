@@ -16,6 +16,11 @@ const userSchema = mongoose.Schema({
             "Please enter a valid email"
         ]
     },
+    pic: {
+        type: "String",
+        required: true,
+        default: "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
+    },
     password: {
         type: String,
         required: [true, "Please add a password"],
@@ -33,17 +38,23 @@ const userSchema = mongoose.Schema({
 })
 
 // Encrypt password before saving to DB
-userSchema.pre("save", async function(next){
+// userSchema.pre("save", async function(next){
 
-    if(!this.isModified("password")){
-        return next()
-    }
-    // hash password
-    const salt = await bcrypt.genSalt(10)
-    const hashedPassword = await bcrypt.hash(this.password,salt)
-    this.password = hashedPassword
-    next()
-})
+//     if(!this.isModified("password")){
+//         return next()
+//     }
+//     // hash password
+//     const salt = await bcrypt.genSalt(10)
+//     const hashedPassword = await bcrypt.hash(this.password,salt)
+//     this.password = hashedPassword
+//     next()
+// })
+
+// userSchema.methods.hashPassword( async (password) => {
+//     const salt = await bcrypt.genSalt(10)
+//     const hashedPassword = await bcrypt.hash(password,salt)
+//     return hashedPassword
+// })
 
 const User = mongoose.model('User',userSchema)
 module.exports = User

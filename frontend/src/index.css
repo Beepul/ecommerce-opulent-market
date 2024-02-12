@@ -1,0 +1,188 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500;600;700;800&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+	@apply font-noto box-border text-textPrimary;
+}
+
+a {
+	@apply transition-all duration-300;
+}
+
+.cart__badge .MuiBadge-badge {
+	@apply bg-primary text-white text-[11px] h-4 min-w-4;
+}
+
+.menu-item {
+	position: relative;
+}
+
+.menu-item:hover {
+	color: #67ad5c;
+}
+
+.menu-item::after {
+	content: '';
+	border: 0.5px solid #67ad5c;
+	position: absolute;
+	top: 100%;
+	left: 0;
+	width: 0;
+	opacity: 0;
+	transition: all ease 0.35s;
+}
+
+.menu-item:hover::after {
+	opacity: 1;
+	width: 100%;
+}
+
+.current-menu-item {
+	color: #67ad5c;
+}
+
+.current-menu-item::after {
+	opacity: 1;
+	width: 100%;
+}
+
+.btn-primary {
+	@apply bg-primary text-white min-w-[120px] min-h-[40px] rounded hover:opacity-[0.8] transition-all duration-300 flex items-center justify-center;
+}
+
+.btn-primary svg path {
+	stroke: rgb(249, 249, 249) !important;
+}
+
+.sidebar__close-btn svg path {
+	fill: white;
+}
+
+.MuiSlider-root {
+	@apply h-[1px];
+}
+.MuiSlider-root .MuiSlider-rail {
+	@apply bg-primary;
+}
+
+.MuiSlider-root .MuiSlider-track {
+	@apply border-primary bg-primary;
+}
+
+.MuiSlider-root .MuiSlider-thumb {
+	@apply h-[14px] w-[14px] bg-white border-[2px] border-primary;
+}
+
+.MuiRating-root .MuiSvgIcon-root path {
+	@apply fill-[#FFC107];
+}
+
+.css-1d3z3hw-MuiOutlinedInput-notchedOutline {
+	border: 0 !important;
+	border-bottom: 1px solid #ccc !important;
+	border-radius: 0 !important;
+}
+
+.or-divider {
+	position: relative;
+	display: inline-block;
+	width: 100%;
+	color: #777777;
+}
+
+.or-divider::after {
+	content: '';
+	border: 1px solid #b6b6b6;
+	position: absolute;
+	top: 50%;
+	right: 0;
+	transform: translateY(-50%);
+	width: 42%;
+}
+.or-divider::before {
+	content: '';
+	border: 0.5px solid #b6b6b6;
+	position: absolute;
+	top: 50%;
+	left: 0;
+	transform: translateY(-50%);
+	width: 42%;
+}
+
+
+
+.category__container::-webkit-scrollbar {
+	width: 6px;
+}
+
+.category__container::-webkit-scrollbar-track {
+    border-radius: 32px;
+	box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+.category__container::-webkit-scrollbar-thumb {
+	background-color: darkgrey;
+	border-radius: 32px;
+}
+
+.star-rating {
+    height: 20px;
+    min-width: 99px;
+    max-width: 99px;
+    position: relative;
+    display: inline-block;
+}
+
+.star-rating::before {
+    --percent: calc(var(--rating) / 5 * 100%);
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 20px;
+    min-width: 20px;
+    width: var(--percent);
+    background-color: #FACF4C;
+    display: inline-block;
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M10.0013 1.66669L11.8723 7.42488H17.9268L13.0286 10.9836L14.8995 16.7418L10.0013 13.1831L5.10309 16.7418L6.97404 10.9836L2.07583 7.42488H8.13035L10.0013 1.66669Z' fill='white'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M10.0013 1.66669L11.8723 7.42488H17.9268L13.0286 10.9836L14.8995 16.7418L10.0013 13.1831L5.10309 16.7418L6.97404 10.9836L2.07583 7.42488H8.13035L10.0013 1.66669Z' fill='white'/%3E%3C/svg%3E");
+    -webkit-mask-repeat: repeat-x;
+    mask-repeat: repeat-x;
+}
+.star-rating::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    height: 20px;
+    min-width: 20px;
+    background-color: #FACF4C;
+    display: inline-block;
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M18.3346 7.70002L12.343 7.18335L10.0013 1.66669L7.65964 7.19169L1.66797 7.70002L6.21797 11.6417L4.8513 17.5L10.0013 14.3917L15.1513 17.5L13.793 11.6417L18.3346 7.70002ZM10.0013 12.8334L6.86797 14.725L7.7013 11.1584L4.93464 8.75835L8.58464 8.44169L10.0013 5.08335L11.4263 8.45002L15.0763 8.76669L12.3096 11.1667L13.143 14.7334L10.0013 12.8334Z' fill='white'/%3E%3C/svg%3E");
+    mask-repeat: repeat-x;
+}
+
+.swiper-button-next,.swiper-button-prev{
+	background-color: #fff;
+	padding: 8px;
+	top: 35%;
+}
+.swiper-button-next::after,.swiper-button-prev::after{
+	font-size: 16px;
+	font-weight: 700;
+	color: #000;
+
+}
+.swiper-button-next{
+	right: 0;
+	border-radius: 2px 0px 0px 2px;
+}
+.swiper-button-prev{
+	left: 0;
+	border-radius: 0px 2px 2px 0;
+}
+
+.bannerSwiper .swiper-button-next,.bannerSwiper .swiper-button-prev{
+	top: 50%;
+}

@@ -6,15 +6,16 @@ const categorySchema = mongoose.Schema({
         required: true,
         unique: true 
     },
-    parent: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Category',
-        default: null 
+    image: {
+        public_id: {
+            type: String,
+            required: true,
+        },
+        url: {
+            type: String,
+            required: true,
+        }
     },
-    children: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Category'
-    }]
 })
 
 const Category = mongoose.model('Category',categorySchema)

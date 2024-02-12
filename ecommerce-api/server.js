@@ -12,12 +12,12 @@ const productRoute = require('./routes/productRoute')
 const categoryRoute = require('./routes/categoryRoute')
 const orderRoute = require('./routes/orderRoute')
 const reviewRoute = require('./routes/reviewRoute')
-const userRoute = require('./routes/userRoute')
 const addressRoute = require('./routes/addressRoute')
-const paymentRoute = require('./routes/paymentRoute')
 const statsRoute = require('./routes/statsRoute')
 const fileUpload = require('express-fileupload')
 const cloudinary = require('./config/cloudinary')
+const stripeRoute = require('./routes/stripe')
+const transactionRoute = require('./routes/transitionRoute')
 
 
 
@@ -32,8 +32,14 @@ const PORT = process.env.PORT || 3500
 
 app.use(logger())
 app.use(cors(corsOptions))
-app.use(express.json())
+
+app.use('/api/v1/stripe/webhook',stripeRoute.stripeWebhookRoute)
+
+app.use(express.urlencoded({extended: true,parameterLimit: 8000, limit: '8mb'}))
+app.use(express.json({limit: '8mb'}))
 app.use(cookieParser())
+
+
 
 app.use(fileUpload({
     useTempFiles: true
@@ -41,15 +47,15 @@ app.use(fileUpload({
 
 app.use(cloudinary)
 
-app.use('/api/auth', authRoute)
-app.use('/api/products', productRoute)
-app.use('/api/categories', categoryRoute)
-app.use('/api/orders', orderRoute)
-app.use('/api/products', reviewRoute)
-app.use('/api/user',userRoute)
-app.use('/api/address',addressRoute)
-app.use('/api/payment',paymentRoute)
-app.use('/api/admin/stats', statsRoute)
+app.use('/api/v1/auth', authRoute)
+app.use('/api/v1/products', productRoute)
+app.use('/api/v1/categories', categoryRoute)
+app.use('/api/v1/orders', orderRoute)
+app.use('/api/v1/review', reviewRoute)
+app.use('/api/v1/address',addressRoute) 
+app.use('/api/v1/admin/stats', statsRoute)
+app.use('/api/v1/stripe', stripeRoute.stripeRoute)
+app.use('/api/v1/transaction', transactionRoute)
 
 
 
@@ -57,9 +63,9 @@ app.get('/api/test',(req,res) => {
     res.send('Hello')
 })
 
-app.use(errorHandler)
-
 connectDB()
+
+app.use(errorHandler)
 
 mongoose.connection.once('open', () => {
     console.log('Connected to MongoDB')
@@ -69,5 +75,5 @@ mongoose.connection.once('open', () => {
 })
 
 mongoose.connection.on('error',err => {
-    console.log(err)
+    console.log("DB Error::",err)
 })

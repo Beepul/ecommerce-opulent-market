@@ -1,6 +1,7 @@
 const asyncHandler = require('express-async-handler')
 const User = require('../models/userModel')
 const Address = require('../models/addressModel')
+const BError = require('../utils/error')
 
 
 // Get all address
@@ -12,8 +13,7 @@ const getAllUserAddress = asyncHandler(async (req,res)=>{
     })
 
     if(!addresses || addresses.length <= 0){
-        res.status(400)
-        throw new Error('No Address found')
+        throw new BError('No Address found',400)
     }
 
     res.status(200).json({
@@ -30,8 +30,7 @@ const getUserAddress = asyncHandler(async (req,res) => {
     const user = await User.findById(userId)
 
     if(!user){
-        res.status(400)
-        throw new Error('User does not exist')
+        throw new BError('User does not exist',400)
     }
 
     const address = await Address.find({user: userId}).populate({
@@ -40,8 +39,7 @@ const getUserAddress = asyncHandler(async (req,res) => {
     })
 
     if(!address || address.length <= 0){
-        res.status(400)
-        throw new Error(`No address found of user ${userId}`)
+        throw new BError(`No address found of user ${userId}`,400)
     }
 
     res.status(200).json({
@@ -53,50 +51,48 @@ const getUserAddress = asyncHandler(async (req,res) => {
 
 // Create new Address
 const createUserAddress = asyncHandler(async (req,res) => {
-    const {userId} = req.params
-    const {street,city,state,postalCode,country} = req.body
-
-    if(!street || !city || !state || !postalCode || !country || !userId){
-        res.status(400)
-        throw new Error("All fields are required")
-    }
-
-    if(isNaN(parseFloat(postalCode)) || !isFinite(postalCode)){
-        res.status(400)
-        throw new Error('Please provide valid postal code')
-    }
-
-    const user = await User.findById(userId)
-
-    if(!user){
-        res.status(400)
-        throw new Error('User does not exist')
-    }
-
-    const addressExist = await Address.find({user: userId})
-
-    if(addressExist.length >=1 || addressExist){
-        await Address.deleteMany({user: userId})
-    }
-
-    const address = await Address.create({
-        user: user._id,
-        street,
-        city,
-        state,
-        postalCode,
-        country
-    })
-
-    if(user && address){
+    try {
+        const userId = req.userId
+        const {street,city,state,postalCode,country} = req.body
+    
+        if(!street || !city || !state || !postalCode || !country){
+            throw new BError("All fields are required",400)
+        }
+    
+        if(isNaN(parseFloat(postalCode)) || !isFinite(postalCode)){
+            throw new BError('Please provide valid postal code',400)
+        }
+    
+        const user = await User.findById(userId)
+    
+        if(!user){
+            throw new BError('User does not exist',400)
+        }
+    
+        const addressExist = await Address.find({user: userId})
+    
+        if(addressExist.length >=1 || addressExist){
+            await Address.deleteMany({user: userId})
+        }
+    
+        const address = await Address.create({
+            user: user._id,
+            street,
+            city,
+            state,
+            postalCode,
+            country
+        })
+    
         res.status(201).json({
             message: "success",
             address
         })
-    }else{
-        res.status(400)
-        throw new Error('Please provide valid data')
+        
+    } catch (error) {
+        throw new BError(error.message || 'Please provide valid data', 400)
     }
+
 
 })
 
@@ -108,26 +104,25 @@ const updateUserAddress = asyncHandler(async (req,res) => {
     let address = await Address.findById(addressId)
 
     if(!address){
-        res.status(400)
-        throw new Error('Address not found')
+        throw new BError('Address not found',400)
     }
 
     if(userId !== address.user.toString()){
-        res.status(401)
-        throw new Error('User and the address author doesnot match')
+        throw new BError('User and the address author doesnot match',401)
     }
 
     address.street = street || address.street 
     address.city = city || address.city 
-    address.state = state || address.state 
+    address.state.code = state.code || address.state.code
+    address.state.name = state.name || address.state.name
     address.postalCode = postalCode || address.postalCode
-    address.country = country || address.country
+    address.country.code = country.code || address.country.code
+    address.country.name = country.name || address.country.name
 
     await address.save()
 
     if(!address){
-        res.status(400)
-        throw new Error('Address not found')
+        throw new BError('Address not found',400)
     }
 
     res.status(200).json({
@@ -144,20 +139,17 @@ const deleteUserAddress = asyncHandler(async (req,res) => {
     const user = await User.findById(userId)
 
     if(!user){
-        res.status(404)
-        throw new Error('User doesnot exits')
+        throw new BError('User doesnot exits',404)
     }
 
     const address = await Address.findById(addressId)
 
     if(!address){
-        res.status(404)
-        throw new Error('Address not found')
+        throw new BError('Address not found',404)
     }
 
     if(user._id.toString() !== address.user.toString()){
-        res.status(401)
-        throw new Error('user doesnot match with this address')
+        throw new BError('user doesnot match with this address',400)
     }
 
     await Address.findByIdAndDelete(address._id)

@@ -1,10 +1,11 @@
 const express = require('express')
 const { getReview, createReview } = require('../controllers/reviewContoller')
+const { validateToken } = require('../middleware/auth')
 
 const router = express.Router()
 
-router.get('/:productId/review',getReview)
-router.post('/:productId/review',createReview)
+router.get('/:productId',getReview)
+router.post('/:productId', validateToken ,createReview)
 
 
 module.exports = router
