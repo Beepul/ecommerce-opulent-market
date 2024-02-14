@@ -1,5 +1,5 @@
 const express = require('express')
-const { signUp, registerAdmin, login, logout, activateUser, getRefreshToken, autoLogin, updateUser, updatePassword, passwordRestLink, resetPassword } = require('../controllers/authController')
+const { signUp, registerAdmin, login, logout, activateUser, getRefreshToken, autoLogin, updateUser, updatePassword, passwordRestLink, resetPassword, googleLogin } = require('../controllers/authController')
 const { validateToken } = require('../middleware/auth')
 const router = express.Router()
 
@@ -14,6 +14,7 @@ router.put('/update/user', validateToken ,updateUser)
 router.put('/update/password', validateToken , updatePassword)
 router.post('/password-rest-link' , passwordRestLink)
 router.put('/reset-password' , resetPassword)
+router.post('/google-login', googleLogin)
 
 
 

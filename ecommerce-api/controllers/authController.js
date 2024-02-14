@@ -6,6 +6,8 @@ const jwt = require('jsonwebtoken')
 const { sendEmail } = require("../utils/mailer")
 const { hashPassword } = require("../utils/hashPassword")
 const BError = require("../utils/error")
+const { OAuth2Client } = require('google-auth-library')
+const generateRandomPassword = require("../utils/randomPasswordGenerator")
 
 const signUp = asyncHandler(async (req,res) => {
     const {name,email,password} = req.body 
@@ -353,6 +355,87 @@ const resetPassword = asyncHandler(async (req,res) => {
     }
 })
 
+const googleClientId = '812605910115-6b89dli2a1hdvu7ic4jks1sidjbcaisf.apps.googleusercontent.com'
+
+const authClient = new OAuth2Client(googleClientId)
+
+const googleLogin = asyncHandler((req,res) => {
+    const {credential,clientId} = req.body
+
+    if(credential){
+        authClient.verifyIdToken({idToken: credential, audience: clientId})
+            .then(async (response) => {
+                const {email_verified,email,name,picture} = response.payload
+                if(email_verified){
+                    try {
+                        const user = await User.findOne({email}).exec()
+
+                        if(user){
+                            const {password,...rest} = user._doc
+                            const accessToken = generateToken(user._id)
+                            const refreshToken = generateRefreshToken(user._id)
+
+                            res.cookie('ecommerceToken', refreshToken, {
+                                httpOnly: true,
+                                secure: true,
+                                sameSite: 'None',
+                                maxAge: 60 * 60 * 1000 // 30 minutes
+                                // maxAge: 30 * 1000 // 5 minutes
+                                // maxAge: 5 * 60 * 1000 // 5 minutes
+                            });
+                            res.status(200).json({
+                                message: 'login success',
+                                user: {...rest,accessToken}
+                            })
+                        }else{
+                            const randomPassword = generateRandomPassword(12);
+                            const newPassowrd = await hashPassword(randomPassword)
+                            const newUser = await User.create({name,email,password: newPassowrd,pic: picture})
+
+                            const {password,...rest} = newUser._doc
+
+                            const accessToken = generateToken(newUser._id)
+                            const refreshToken = generateRefreshToken(newUser._id)
+
+                            // console.log('Sending email ...')
+                            
+                            // sendEmail({
+                            //     email,
+                            //     subject: 'Seven Shop Password',
+                            //     message: `
+                            //         <h2>Hello ${name}</h2>
+                            //         <p>Your current password is set as:</p>
+                            //         <h3>${newPassowrd}</h3><br><br>
+                            //         <p>Please feel free to change your password.</p>
+                            //     `
+                            // })
+
+                            // console.log('After email sending!')
+
+                            res.cookie('ecommerceToken', refreshToken, {
+                                httpOnly: true,
+                                secure: true,
+                                sameSite: 'None',
+                                maxAge: 60 * 60 * 1000 // 30 minutes
+                                // maxAge: 30 * 1000 // 5 minutes
+                                // maxAge: 5 * 60 * 1000 // 5 minutes
+                            });
+                            res.status(200).json({
+                                message: 'signup success',
+                                user: {...rest,accessToken}
+                            })
+                        }
+                    } catch (error) {
+                        throw new BError(error.message || 'Failed to login', 400)
+                    }
+                }
+            })
+            .catch(err =>  {
+                throw new BError(err.message || 'Failed to login, Please contact owner', 400)
+            })
+    }
+})
+
 
 module.exports = {
     signUp,
@@ -365,5 +448,6 @@ module.exports = {
     updateUser,
     updatePassword,
     passwordRestLink,
-    resetPassword
+    resetPassword,
+    googleLogin
 }

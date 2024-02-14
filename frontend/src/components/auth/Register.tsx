@@ -1,10 +1,13 @@
 import { useState } from 'react'
 import { IoEyeOutline,IoEyeOffOutline } from "react-icons/io5";
 import { toast } from 'react-toastify';
-import { useRegisterMutation } from '../../redux/services/authApi';
+import { useGoogleLoginMutation, useRegisterMutation } from '../../redux/services/authApi';
 import { ResponseError } from '../../type/error';
 import animationData from '../../assets/animations/loading.json';
 import Lottie from 'lottie-react'
+import { useDispatch } from 'react-redux';
+import { CredentialResponse, GoogleLogin } from '@react-oauth/google';
+import { setCredentials } from '../../redux/features/authSlice';
 
 const initialFormData = {
   name: '',
@@ -19,7 +22,12 @@ const Register = () => {
 
   const [register,{isLoading}] = useRegisterMutation()
 
+  const [googleLogin, {isLoading: glLoading}] = useGoogleLoginMutation()
+
+
   const {name,email,password,cPassword} = formData
+
+  const dispatch = useDispatch()
 
   const handleChange = (e:React.ChangeEvent<HTMLInputElement>) => {
     setFormData({...formData, [e.target.name]: e.target.value})
@@ -61,9 +69,27 @@ const Register = () => {
       });
     } catch (error) {
       const resError = error as ResponseError
-      toast.error(resError.data.message, {
+      toast.error(resError?.data?.message, {
         position: "top-right"
       });
+    }
+  }
+
+  const handleGoogleLogin = async (credentialResponse: CredentialResponse) => {
+
+    try {
+        const result = await googleLogin(credentialResponse).unwrap()
+        console.log('Google Login',result)
+        if('error' in result){
+            toast.error('Could not login with google')
+            return
+        }
+        dispatch(setCredentials(result.user))
+        toast.success('Login Success')
+    } catch (error) {
+        console.log(error)
+        const resError = error as ResponseError
+        toast.error(resError.data?.message || 'Failed to login with google')
     }
   }
 
@@ -110,23 +136,37 @@ const Register = () => {
                   </span>
               </div>
           </div>
-          <button type='submit' disabled={isLoading} className='btn-primary mt-3 disabled:cursor-not-allowed disabled:opacity-[1]'>
-            {isLoading ? (
-              <Lottie
-                animationData={animationData}
-                loop={true}
-                autoplay={true}
-                rendererSettings={{
-                  preserveAspectRatio: "xMidYMid slice",
+          <div className='flex items-center gap-6 flex-wrap'>
+            <button type='submit' disabled={isLoading} className='btn-primary mt-3 disabled:cursor-not-allowed disabled:opacity-[1]'>
+              {isLoading ? (
+                <Lottie
+                  animationData={animationData}
+                  loop={true}
+                  autoplay={true}
+                  rendererSettings={{
+                    preserveAspectRatio: "xMidYMid slice",
+                  }}
+                  width={50}
+                  height={50}
+                  style={{maxHeight:'40px', maxWidth: '40px'}}
+                />
+              ): (
+                'Register'
+              )}
+            </button>
+            <GoogleLogin 
+                onSuccess={(credentialResponse: CredentialResponse) => {
+                    handleGoogleLogin(credentialResponse)
                 }}
-                width={50}
-                height={50}
-                style={{maxHeight:'40px', maxWidth: '40px'}}
-              />
-            ): (
-              'Register'
-            )}
-          </button>
+                onError={() => {
+                    console.log('Login Failed');
+                }}
+                theme='outline'
+                shape='pill'
+                size='medium'
+                text='continue_with'
+            />
+          </div>
       </form>
     </>
   )

@@ -101,6 +101,15 @@ export const authApi = baseApi.injectEndpoints({
                 method: 'PUT',
                 body: data
             })
+        }),
+        googleLogin: builder.mutation({
+            query: (data) => {
+                return ({
+                    url: '/auth/google-login',
+                    method: 'POST',
+                    body: data
+                })
+            }
         })
     })
 })
@@ -115,5 +124,6 @@ export const {
     useUpdateCredentialsMutation, 
     useUpdatePasswordMutation ,
     useForgotPasswordMutation,
-    useResetPasswordMutation
+    useResetPasswordMutation,
+    useGoogleLoginMutation
 } = authApi

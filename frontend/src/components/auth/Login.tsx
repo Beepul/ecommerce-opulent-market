@@ -1,19 +1,19 @@
 import React, { useState } from 'react'
 import { IoEyeOutline,IoEyeOffOutline } from "react-icons/io5";
-import { useLoginMutation } from '../../redux/services/authApi';
-import Lottie from 'lottie-react';
-import animationData from '../../assets/animations/loading.json'
+import { useGoogleLoginMutation, useLoginMutation } from '../../redux/services/authApi';
 import { ResponseError } from '../../type/error';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
 import { setCredentials } from '../../redux/features/authSlice';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import SubmitButton from '../SubmitButton';
+import { CredentialResponse, GoogleLogin, useGoogleLogin } from '@react-oauth/google';
 
 const initialFormData = {
     email: '',
     password: ''
 }
+
 
 const Login = () => {
     const [formData,setFormData] = useState(initialFormData)
@@ -24,14 +24,11 @@ const Login = () => {
 
   const [login,{isLoading}] = useLoginMutation()
 
+  const [googleLogin, {isLoading: glLoading}] = useGoogleLoginMutation()
+
   const location = useLocation()
 
   const from = location.state?.from?.pathname || '/'
-
-
-  const googleLogin = () => {
-    window.open('http://localhost:5000/api/v1/auth/google', '_self')
-  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({...formData, [e.target.name]: e.target.value})
@@ -63,6 +60,26 @@ const Login = () => {
         });
     }
   }
+
+  const handleGoogleLogin = async (credentialResponse: CredentialResponse) => {
+
+    try {
+        const result = await googleLogin(credentialResponse).unwrap()
+        console.log('Google Login',result)
+        if('error' in result){
+            toast.error('Could not login with google')
+            return
+        }
+        dispatch(setCredentials(result.user))
+        toast.success('Login Success')
+    } catch (error) {
+        console.log(error)
+        const resError = error as ResponseError
+        toast.error(resError.data?.message || 'Failed to login with google')
+    }
+  }
+
+
   return (
     <>
       <h4 className='font-semibold text-[20px] mb-6'>Login</h4>
@@ -89,7 +106,19 @@ const Login = () => {
           <Link to={'/login/forgot-password'} className='text-blue-500 border-b border-blue-500 text-sm mb-4'>Forgot Passowrd?</Link>
           <div className='flex items-center gap-8 pt-4 flex-wrap'>
             <SubmitButton isLoading={isLoading} title='Login' />
-            <button type='button' className='btn-primary cursor-pointer w-full px-4 md:w-auto items-center gap-2' onClick={googleLogin}>Login With Google </button>
+            {/* <button type='button' className='btn-primary cursor-pointer w-full px-4 md:w-auto items-center gap-2' onClick={() => loginG()}>Login With Google </button> */}
+            <GoogleLogin 
+                onSuccess={(credentialResponse: CredentialResponse) => {
+                    handleGoogleLogin(credentialResponse)
+                }}
+                onError={() => {
+                    console.log('Login Failed');
+                }}
+                theme='outline'
+                shape='pill'
+                size='medium'
+                text='continue_with'
+            />
           </div>
       </form>
     </>

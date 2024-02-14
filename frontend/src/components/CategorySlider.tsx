@@ -4,6 +4,7 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import { Category } from '../type/category'
 import { Skeleton } from '@mui/material'
 import { LazyLoadImage } from 'react-lazy-load-image-component'
+import { Link } from 'react-router-dom'
 
 
 const CategorySlider = ({categories, isLoading}: {categories: Category[]; isLoading: boolean}) => {
@@ -47,11 +48,13 @@ const CategorySlider = ({categories, isLoading}: {categories: Category[]; isLoad
                 categories.map((cat) => (
                   <SwiperSlide key={cat._id}>
                     <div>
-                      <div className=''>
-                        <LazyLoadImage src={cat.image?.url} alt={cat.name} effect='blur' height={160} width={'100%'}  className='object-contain h-full'/>
-                      </div>
-                      <h4 className='w-full text-center mt-8 pb-1 font-semibold capitalize text-lg'>{cat.name}</h4>
-                      <span className='text-center inline-block w-full'>{cat.count ? cat.count : 0} Products</span>
+                      <Link to={`/shop?catQuery=${cat?._id}`}>
+                        <div className=''>
+                          <LazyLoadImage src={cat.image?.url} alt={cat.name} effect='blur' height={160} width={'100%'}  className='object-contain h-full'/>
+                        </div>
+                        <h4 className='w-full text-center mt-8 pb-1 font-semibold capitalize text-lg'>{cat.name}</h4>
+                        <span className='text-center inline-block w-full'>{cat.count ? cat.count : 0} Products</span>
+                      </Link>
                     </div>
                   </SwiperSlide>
                 ))
