@@ -37,7 +37,9 @@ const SingleProduct = () => {
     const discountDecimal = Number(discount) / 100;
     const discountedPrice = Number(price) * discountDecimal;
 
-    return discountedPrice
+    const afterDiscountPrice = Number(price) - Number(discountedPrice)
+
+    return afterDiscountPrice
   }
 
   const handleAddToCart = (product: Product) => {

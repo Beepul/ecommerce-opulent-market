@@ -59,8 +59,8 @@ app.use('/api/v1/transaction', transactionRoute)
 
 
 
-app.get('/api/test',(req,res) => {
-    res.send('Hello')
+app.get('/',(req,res) => {
+    res.send('Seven Shop')
 })
 
 connectDB()

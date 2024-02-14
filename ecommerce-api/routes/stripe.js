@@ -1,8 +1,5 @@
 const express = require('express')
 const Stripe = require('stripe')
-const getRawBody = require('raw-body')
-const bodyParser = require('body-parser')
-const User = require('../models/userModel')
 const Order = require('../models/orderModel')
 const Address = require('../models/addressModel')
 const Transaction = require('../models/transactionModel')
@@ -19,7 +16,7 @@ stripeRoute.post('/create-checkout-session', async (req, res) => {
   try {
     const {cart,userId,address} = req.body
     // console.log(cart)
-    console.log("Address::",address)
+    // console.log("Address::",address)
   
     if(!cart || cart.length <= 0){
       res.status(400).json({
@@ -96,15 +93,13 @@ stripeRoute.post('/create-checkout-session', async (req, res) => {
   
     res.send({url: session.url});
   } catch (error) {
+    console.log(error)
     res.status(400).json({
       message: error.message
     })
   }
 });
 
-// This is your Stripe CLI webhook secret for testing your endpoint locally.
-let endpointSecret
- endpointSecret = "whsec_a9ca32ba4005cfc50bd8c1443f01537bcab085ba1f776d59127db2577b5bba20";
 
 
 
@@ -115,8 +110,8 @@ stripeWebhookRoute.post('/', express.raw({type: 'application/json'}), (request, 
   let event;
 
   try {
-    event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
-    console.log('Webhook Event::', event)
+    event = stripe.webhooks.constructEvent(request.body, sig, process.env.STRIPE_ENDPOINT_SK_KEY);
+    // console.log('Webhook Event::', event)
   } catch (err) {
     console.log(`Webhook Error:: ${err.message}`)
     response.status(400).send(`Webhook Error: ${err.message}`);
@@ -129,7 +124,7 @@ stripeWebhookRoute.post('/', express.raw({type: 'application/json'}), (request, 
       const data = event.data.object;
       stripe.customers.retrieve(data.customer).then( async (customer) => {
         const {cart,userId,address} = customer.metadata
-        console.log({cart,userId,address});
+        // console.log({cart,userId,address});
         // console.log("data::", data);
 
         // Create Address
@@ -137,7 +132,7 @@ stripeWebhookRoute.post('/', express.raw({type: 'application/json'}), (request, 
         addressData.user = userId
         const userAddress = await Address.create(addressData)
 
-        console.log("Address Created::", userAddress)
+        console.log("Address Created")
 
         // Create Order
         const orderData = {
@@ -159,7 +154,7 @@ stripeWebhookRoute.post('/', express.raw({type: 'application/json'}), (request, 
 
         const order = await Order.create(orderData)
 
-        console.log("Order Created::", order)
+        console.log("Order Created")
 
         // Create Transaction
 
@@ -175,7 +170,7 @@ stripeWebhookRoute.post('/', express.raw({type: 'application/json'}), (request, 
 
         const transaction = await Transaction.create(transactionData)
 
-        console.log("Transaction Created::", transaction)
+        console.log("Transaction Created")
 
       }).catch(err => console.log(err.message));
       break;

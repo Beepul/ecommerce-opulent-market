@@ -33,16 +33,12 @@ const isAdmin = async (req,res,next) => {
        const user = await User.findById(userId).select('role') 
 
        if(user.role !== 'admin'){
-            return res.status(403).json({
-                message: 'Only admin is allowed to access this resources'
-            })
+            return next(new BError('Only admin is allowed to access this resources', 403))
        }
 
        next()
     } catch (error) {
-        return res.status(400).json({
-            message: error.message
-        })
+        return next(new BError(error.message || 'Admin resources', 403))
     }
 }
 

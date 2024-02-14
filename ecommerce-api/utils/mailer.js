@@ -1,4 +1,5 @@
 const nodeMailer = require('nodemailer')
+const BError = require('./error')
 
 const sendEmail = (options) => {
     // Create email transporter
@@ -24,10 +25,7 @@ const sendEmail = (options) => {
 
     transporter.sendMail(mailOptions, function(error, res){
         if(error){
-            res.status(400)
-            throw new Error('Failed to send Email')
-        }else{
-            res.send("Email has been sent successfully");
+            throw new BError('Failed to send Email',400)
         }
     })
 }

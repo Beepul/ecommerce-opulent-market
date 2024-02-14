@@ -355,9 +355,8 @@ const resetPassword = asyncHandler(async (req,res) => {
     }
 })
 
-const googleClientId = '812605910115-6b89dli2a1hdvu7ic4jks1sidjbcaisf.apps.googleusercontent.com'
 
-const authClient = new OAuth2Client(googleClientId)
+const authClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 
 const googleLogin = asyncHandler((req,res) => {
     const {credential,clientId} = req.body

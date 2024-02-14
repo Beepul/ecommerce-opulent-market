@@ -23,14 +23,14 @@ const Checkout = () => {
   const cart = useSelector((state: RootState) => state.cart)
   const address = useSelector((state: RootState) => state.order.addressInfo)
 
-  console.log(address)
+  // console.log(address)
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
   const handleSubmit = (e:React.FormEvent) => {
     e.preventDefault()
-    if(!country || !cstate || !city || !postalCode || !street || !phoneNumber){
+    if(!country.code || !country.name || !cstate.code || !cstate.name || !city || !postalCode || !street || !phoneNumber){
       toast.error('All Fields Required!')
       return
     }

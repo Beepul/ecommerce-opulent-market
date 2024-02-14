@@ -22,8 +22,12 @@ const ProductCard:React.FC<ProductCardProps> = ({product}) => {
     
         const discountDecimal = Number(discount) / 100;
         const discountedPrice = Number(price) * discountDecimal;
+
+        const afterDiscountPrice = Number(price) - Number(discountedPrice)
+
+        // console.log({price,discount,discountedPrice,afterDiscountPrice})
     
-        return discountedPrice
+        return afterDiscountPrice
       }
 
     const handleAddToCart = () => {

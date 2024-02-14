@@ -97,7 +97,7 @@ const HeaderBottom = () => {
 						<ListItem disablePadding key={`menu-${index}`} className='border-b-[1px] border-[#ccc]'>
 							<ListItemButton>
 							<ListItemText >
-								<Link to={item.link} className={`${item.link === location.pathname ? 'text-primary' : 'text-textPrimary'}`}>{item.label}</Link>
+								<Link to={item.link} className={`${item.link === location.pathname ? 'text-primary' : 'text-textPrimary'} w-full inline-block`}>{item.label}</Link>
 							</ListItemText>
 							</ListItemButton>
 						</ListItem>
