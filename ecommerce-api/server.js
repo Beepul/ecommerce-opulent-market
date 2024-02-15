@@ -60,6 +60,7 @@ app.use('/api/v1/transaction', transactionRoute)
 
 
 app.get('/',(req,res) => {
+    console.log('Seven Shop')
     res.send('Seven Shop')
 })
 
