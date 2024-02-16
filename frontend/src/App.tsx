@@ -10,6 +10,7 @@ import { ToastContainer } from "react-toastify"
 import { useAutoLoginQuery } from "./redux/services/authApi"
 import { useSelector } from "react-redux"
 import { RootState } from "./redux/store"
+import NotFound from "./pages/NotFound"
 
 import Loader from './components/Loader';
 const Header =lazy(() => import("./components/header/Header")) 
@@ -22,7 +23,7 @@ const Home = lazy(() => import('./pages/public/Home'))
 const Shop = lazy(() => import("./pages/public/Shop"))
 const LoginRegister = lazy(() => import("./pages/public/LoginRegister")) 
 const ActivateUser = lazy(() => import("./pages/public/ActivateUser")) 
-const NotFound = lazy(() => import("./pages/NotFound")) 
+
 const Profile = lazy(() => import("./pages/public/Profile")) 
 const Dashboard = lazy(() => import("./pages/admin/Dashboard/Dashboard")) 
 const CreateProduct = lazy(() => import("./pages/admin/Products/CreateProduct")) 
