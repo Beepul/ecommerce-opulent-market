@@ -1,4 +1,3 @@
-import React from 'react'
 import DashTitle from '../DashTitle'
 import { useGetAllOrdersQuery } from '../../../redux/services/orderApi'
 import { useParams } from 'react-router-dom'

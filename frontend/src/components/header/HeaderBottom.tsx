@@ -4,16 +4,11 @@ import { primaryMenu } from '../../static/menu';
 import {
 	Badge,
 	Box,
-	Divider,
 	Drawer,
-	IconButton,
-	InputBase,
 	List,
 	ListItem,
 	ListItemButton,
-	ListItemIcon,
 	ListItemText,
-	Paper
 } from '@mui/material';
 import { GrCart } from 'react-icons/gr';
 import { IoSearch } from 'react-icons/io5';

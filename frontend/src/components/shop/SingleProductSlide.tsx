@@ -1,39 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
-// Import Swiper React components
-import { Swiper, SwiperSlide } from 'swiper/react';
+import React, { useEffect, useState } from 'react';
 
-// Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/free-mode';
 import 'swiper/css/navigation';
 import 'swiper/css/thumbs';
 
-import {Swiper as SwiperType} from 'swiper/types'
-
-
-// import required modules
-import { FreeMode, Navigation, Thumbs } from 'swiper/modules';
 import ImageMagnifier from '../ImageMagnifier';
 import { Image } from '../../type/product';
 
-
-// const images = [
-//   {
-//     src: "https://picsum.photos/320/240?v1"
-//   },
-//   {
-//     src: "https://picsum.photos/320/240?v2"
-//   },
-//   {
-//     src: "https://picsum.photos/320/240?v3"
-//   },
-//   {
-//     src: "https://picsum.photos/320/240?v4"
-//   },
-//   {
-//     src: "https://picsum.photos/320/240?v4"
-//   }
-// ];
 
 type SingleProductSlideProps = {
   images: Image[]
@@ -41,11 +15,6 @@ type SingleProductSlideProps = {
 
 const SingleProductSlide: React.FC<SingleProductSlideProps> = ({images}) => {
   const [imageToShow, setImageTOShow] = useState('')
-
-
-  const handleImageSelection = (src: string) => {
-    setImageTOShow(src)
-  }
 
   useEffect(() => {
     if(images){

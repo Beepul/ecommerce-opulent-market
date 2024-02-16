@@ -52,7 +52,7 @@ const Review: React.FC<ReviewProps> = ({product}) => {
         <Rating
           name="simple-controlled"
           value={ratingVal}
-          onChange={(event, newValue) => {
+          onChange={(_, newValue) => {
             setRatingVal(newValue);
           }}
         />

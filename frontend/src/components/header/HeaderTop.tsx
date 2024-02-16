@@ -1,9 +1,7 @@
 import { PiHeadphonesDuotone } from "react-icons/pi";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { secondaryMenu } from "../../static/menu";
 import { CgProfile } from "react-icons/cg";
 import { User } from "../../type/user";
-import { RiLogoutCircleLine } from "react-icons/ri";
 import { useLogoutUserMutation } from "../../redux/services/authApi";
 import { ResponseError } from "../../type/error";
 import { toast } from "react-toastify";
@@ -31,13 +29,6 @@ const HeaderTop:React.FC<HeaderTopProps> = ({user}) => {
 
   const navigate = useNavigate()
 
-  const filteredSecondaryMenu = secondaryMenu.filter((item) => {
-    if(user){
-      return item.login === true
-    }else{
-      return item.login === false
-    }
-  })
 
   const logout = async () => {
     try {

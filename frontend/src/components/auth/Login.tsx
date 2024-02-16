@@ -7,7 +7,7 @@ import { useDispatch } from 'react-redux';
 import { setCredentials } from '../../redux/features/authSlice';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import SubmitButton from '../SubmitButton';
-import { CredentialResponse, GoogleLogin, useGoogleLogin } from '@react-oauth/google';
+import { CredentialResponse, GoogleLogin } from '@react-oauth/google';
 
 const initialFormData = {
     email: '',
@@ -24,7 +24,7 @@ const Login = () => {
 
   const [login,{isLoading}] = useLoginMutation()
 
-  const [googleLogin, {isLoading: glLoading}] = useGoogleLoginMutation()
+  const [googleLogin] = useGoogleLoginMutation()
 
   const location = useLocation()
 

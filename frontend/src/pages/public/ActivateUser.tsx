@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import {useActivateUserQuery} from '../../redux/services/authApi'
 import { ResponseError } from '../../type/error'
@@ -20,7 +19,7 @@ const ActivateUser = () => {
 
     if(resErr){
       return <div className='min-h-[500px] flex items-center justify-center flex-col'>
-        <p className='capitalize font-semibold text-3xl'>Opps!!! {resErr.data.message}</p>
+        <p className='capitalize font-semibold text-3xl'>Opps!!! {resErr?.data?.message}</p>
         <span>Please try again!</span>
       </div>
     }

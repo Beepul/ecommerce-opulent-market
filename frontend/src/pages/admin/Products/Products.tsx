@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import DashTitle from '../DashTitle'
 
-import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@mui/material';
 import { AiOutlineDelete, AiOutlineEye } from 'react-icons/ai';
 import { FiEdit } from "react-icons/fi";
@@ -12,10 +12,6 @@ import Loader from '../../../components/Loader';
 import { ResponseError } from '../../../type/error';
 import { toast } from 'react-toastify';
 
-// const initialState = {
-//   pageSize: 5,
-//   page: 0
-// }
 
 type DataGridProduct = {
   id: string;

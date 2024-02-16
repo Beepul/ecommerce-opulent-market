@@ -1,4 +1,4 @@
-import { BaseQueryApi, FetchArgs, FetchBaseQueryError, FetchBaseQueryMeta, createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { BaseQueryApi, FetchArgs, createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { RootState } from "../store";
 import { logOutUser, setCredentials } from "../features/authSlice";
 import { User } from "../../type/user";
@@ -55,5 +55,5 @@ export const baseApi = createApi({
     baseQuery: baseQueryWithReauth,
     // keepUnusedDataFor: 5,
     tagTypes: ['AutoLogin','Product','SingleProduct','Category','Order'],
-    endpoints: (builder) => ({})
+    endpoints: (_builder) => ({})
 })  

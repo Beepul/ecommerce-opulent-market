@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Product } from '../type/product';
 import dayjs from 'dayjs';
 import {LazyLoadImage} from 'react-lazy-load-image-component'

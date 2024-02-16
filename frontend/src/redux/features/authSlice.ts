@@ -1,10 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { User } from '../../type/user'
-import { useAutoLoginQuery } from '../services/authApi';
 
 type AuthState = {
   user: User | null;
-  // loading: 'idle' | 'pending' | 'succeeded' | 'failed';
 }
 
 const initialState: AuthState = {

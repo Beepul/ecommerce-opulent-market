@@ -1,8 +1,5 @@
-import React, { useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '../redux/store';
+import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
-import { useAutoLoginQuery } from '../redux/services/authApi';
 import Loader from '../components/Loader';
 import { User } from '../type/user';
 

@@ -1,7 +1,7 @@
 import { FormEvent, useEffect, useRef, useState } from 'react';
 import DashTitle from '../DashTitle'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DatePicker, DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
 import { toast } from 'react-toastify';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
@@ -12,15 +12,6 @@ import { Category } from '../../../type/category';
 import SubmitButton from '../../../components/SubmitButton';
 import { useParams } from 'react-router-dom';
 import { Image, Product } from '../../../type/product';
-
-
-// const categories = [
-//   {name: 'Oliver Hansen', id: 1},
-//   {name: 'Van Henry', id: 2},
-//   {name: 'April Tucker', id: 3},
-//   {name: 'Ralph Hubbard', id: 4},
-//   {name: 'Omar Alexander', id: 5},
-// ];
 
 
 const allowedImageTypes = ['image/png',"image/jpg","image/jpeg"]
@@ -41,7 +32,7 @@ const CreateProduct = () => {
   const [images, setImages] = useState<Array<Image | string | ArrayBuffer>>([]);
 
   const [addProduct,{isLoading}] = useAddProductMutation()
-  const {isLoading:catLoading ,data: catData} = useGetAllCategoryQuery('')
+  const {isLoading:_catLoading ,data: catData} = useGetAllCategoryQuery('')
 
   const {id} = useParams()
   const {productToEdit}:{productToEdit: Product} = useGetProductsQuery('productList',{

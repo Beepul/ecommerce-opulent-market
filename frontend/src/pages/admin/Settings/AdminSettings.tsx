@@ -1,4 +1,3 @@
-import React from 'react'
 import DashTitle from '../DashTitle'
 import AccountSetting from '../../AccountSetting'
 

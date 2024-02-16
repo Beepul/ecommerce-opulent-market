@@ -1,4 +1,3 @@
-import React from 'react'
 import { bannerData } from '../static/data'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Autoplay, Navigation } from 'swiper/modules'

@@ -1,11 +1,10 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { RootState } from '../../redux/store'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import CheckoutSteps from '../../components/checkout/CheckoutSteps'
 import Checkout from '../../components/checkout/Checkout'
-import PayButton from '../../components/PayButton'
 
 const CheckoutPage = () => {
   const cart = useSelector((state:RootState) => state.cart)

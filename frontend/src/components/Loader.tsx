@@ -1,5 +1,4 @@
 import Lottie from 'lottie-react'
-import React from 'react'
 import animationData from '../assets/animations/loading.json'
 
 

@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from 'react'
 import { services } from '../../static/menu'
 import SectionTitle from '../admin/SectionTitle'
 import { useGetProductsQuery } from '../../redux/services/productApi'
@@ -29,6 +28,8 @@ const Home = () => {
   const {data: bestSellingProductData, isLoading: bestSellingLoading} = useGetBestSellingProductQuery('')
   const {data: catData, isLoading: topCatLoading} = useTopCategoriesQuery('')
 
+  
+
   const {offerProducts, offerLoading} = useGetProductsQuery({},{
     selectFromResult: ({data,isLoading}) => {
       const offerProducts = data?.products?.filter((p: Product) => p.offer.isOffered)
@@ -38,6 +39,8 @@ const Home = () => {
       }
     }
   })
+
+  console.log(offerProducts)
 
   const offProd = [
     {
@@ -193,7 +196,7 @@ const Home = () => {
                 </div>
             </div>
           ) : (
-            <ProductSlider products={bestSellingProductData?.mostSoldProducts?.map((p: {product: Product;totalQuantitySold: number}) => p.product)} />
+            <ProductSlider products={bestSellingProductData?.mostSoldProducts?.map((p: {product?: Product;totalQuantitySold?: number}) => p?.product)} />
           )}
 
         </div>

@@ -1,6 +1,5 @@
 import { CgProfile } from "react-icons/cg";
 import { CiCircleQuestion } from "react-icons/ci";
-import { FaMapLocationDot } from "react-icons/fa6";
 import { FaFacebookF,FaInstagram,FaLinkedinIn,FaTwitter } from "react-icons/fa";
 import { MdOutlineSpaceDashboard } from "react-icons/md";
 import { IoCartOutline } from "react-icons/io5";

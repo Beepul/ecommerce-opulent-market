@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useState } from 'react'
 import SubmitButton from '../components/SubmitButton'
 import { useForgotPasswordMutation } from '../redux/services/authApi'
 import { toast } from 'react-toastify'

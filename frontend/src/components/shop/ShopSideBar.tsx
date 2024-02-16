@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 // import { categories } from '../../static/categories'
 import { Rating, Slider } from '@mui/material'
 import { useGetAllCategoryQuery } from '../../redux/services/categoryApi';
@@ -48,11 +48,7 @@ const ShopSideBar:React.FC<ShopSideBarProps> = ({
   const {data: catData} = useGetAllCategoryQuery('getALlCategory')
   
 
-  const handlePriceSlider = (
-    event: Event,
-    newValue: number | number[],
-    activeThumb: number,
-  ) => {
+  const handlePriceSlider = (_: Event, newValue: number | number[], activeThumb: number) => {
     if (!Array.isArray(newValue)) {
       return;
     }
@@ -109,7 +105,7 @@ const ShopSideBar:React.FC<ShopSideBarProps> = ({
           name="simple-controlled"
           value={ratingValue}
           color='yellow'
-          onChange={(event, newValue) => {
+          onChange={(_, newValue) => {
             setPage(1)
             setRatingValue(newValue);
           }}

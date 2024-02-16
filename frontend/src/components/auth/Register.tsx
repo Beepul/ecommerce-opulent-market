@@ -22,7 +22,7 @@ const Register = () => {
 
   const [register,{isLoading}] = useRegisterMutation()
 
-  const [googleLogin, {isLoading: glLoading}] = useGoogleLoginMutation()
+  const [googleLogin] = useGoogleLoginMutation()
 
 
   const {name,email,password,cPassword} = formData

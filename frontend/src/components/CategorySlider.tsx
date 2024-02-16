@@ -1,4 +1,3 @@
-import React from 'react'
 import { Navigation } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Category } from '../type/category'
@@ -35,7 +34,7 @@ const CategorySlider = ({categories, isLoading}: {categories: Category[]; isLoad
         >
           {
             isLoading ? (
-              Array.from(new Array(10)).map((item,i) => (
+              Array.from(new Array(10)).map((_,i) => (
                 <SwiperSlide key={i}>
                   <div className='w-full'>
                     <Skeleton variant="rectangular" width={"100%"} height={180} className='mb-5'/>
@@ -45,7 +44,7 @@ const CategorySlider = ({categories, isLoading}: {categories: Category[]; isLoad
                 </SwiperSlide>
               ))
             ) : (
-                categories.map((cat) => (
+                categories && categories.map((cat) => (
                   <SwiperSlide key={cat._id}>
                     <div>
                       <Link to={`/shop?catQuery=${cat?._id}`}>

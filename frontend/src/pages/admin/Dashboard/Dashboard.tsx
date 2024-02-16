@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import DashTitle from '../DashTitle'
 import { UserData } from '../../../static/data'
 import { useGetAllUserQuery, useGetBestSellingProductQuery, useGetTotalSalesQuery, useTopCategoriesQuery, useTotalProfileLossQuery } from '../../../redux/services/statsApi'
@@ -9,8 +9,6 @@ import PieChart from '../../../components/charts/PieChart'
 import { ChartType } from '../../../type/chart'
 import { TopCategory } from '../../../type/category'
 import BarChart from '../../../components/charts/BarChart';
-import {BestSellingProduct} from '../../../type/product';
-import LineChart from '../../../components/charts/LineChart';
 import BestSellingProducts from '../Products/BestSellingProducts';
 
 const initialChartData: ChartType = {
@@ -24,7 +22,7 @@ const initialChartData: ChartType = {
 }
 
 const Dashboard = () => {
-  const [userData,setUserData] = useState({
+  const [userData,_setUserData] = useState({
     labels: UserData.map((data) => data.year.toString()),
     datasets: [
       {

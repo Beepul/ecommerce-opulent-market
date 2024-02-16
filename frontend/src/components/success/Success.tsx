@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { clearCart } from '../../redux/features/cartSlice'
 import animationData from '../../assets/animations/success.json'

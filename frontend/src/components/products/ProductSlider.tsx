@@ -1,7 +1,6 @@
 import React from 'react';
 import { Product } from '../../type/product';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import SwiperCore from 'swiper/core'; // Update this import statement
 import { Navigation } from 'swiper/modules';
 import ProductCard from './ProductCard';
 
@@ -21,7 +20,7 @@ const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
         navigation
         modules={[Navigation]}
         className="mySwiper"
-        loop={products.length > 4 ? true : false}
+        loop={products?.length > 4 ? true : false}
         breakpoints={{
           0: {
             slidesPerView: 1
@@ -37,7 +36,7 @@ const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
           },
         }}
       >
-        {products.map((product, i) => (
+        {products && products.map((product, i) => (
           <SwiperSlide key={i}>
             <ProductCard product={product} />
           </SwiperSlide>

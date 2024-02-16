@@ -1,9 +1,8 @@
-import { Box, Divider, Drawer, FormControl, InputLabel, List, ListItem, ListItemButton, ListItemIcon, ListItemText, MenuItem, Select, SelectChangeEvent } from '@mui/material'
+import { Box, Drawer, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material'
 import React, { useState } from 'react'
 import { HiMiniBars3BottomRight } from "react-icons/hi2";
 import { IoIosCloseCircleOutline } from 'react-icons/io';
 import { Anchor } from '../../type/SideDrawer';
-import SideDrawer from '../SideDrawer';
 import ShopSideBar from './ShopSideBar';
 import ShopProductList from '../products/ShopProductList';
 import { Product } from '../../type/product';

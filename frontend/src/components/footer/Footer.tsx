@@ -37,7 +37,7 @@ const Footer = () => {
                       </li>
                     ))
                    ) : (
-                    catData.topCategories.slice(0,5).map((cat: TopCategory, i: number) => (
+                    catData?.topCategories && catData.topCategories.slice(0,5).map((cat: TopCategory, i: number) => (
                     <li key={i} className='text-[15px] mb-1 cursor-pointer hover:text-primary transition-all duration-300 capitalize'>
                       <Link className='capitalize' to={`/shop?catQuery=${cat?._id}`}>
                         {cat.categoryName}
@@ -58,7 +58,7 @@ const Footer = () => {
                     <Skeleton variant="text" sx={{ fontSize: '1rem' }} />
                   </li>
                 ) : (
-                  topProductData.mostSoldProducts.slice(0,5).map((bestProd: BestSellingProduct) => (
+                  topProductData?.mostSoldProducts && topProductData.mostSoldProducts.slice(0,5).map((bestProd: BestSellingProduct) => (
                     <li key={bestProd.product._id} className='text-[15px] mb-1 cursor-pointer hover:text-primary transition-all duration-300'>
                       <Link className='capitalize' to={`/product/${bestProd.product._id}`}>
                         {bestProd.product.name}

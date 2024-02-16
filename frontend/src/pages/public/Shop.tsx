@@ -77,7 +77,7 @@ const Shop = () => {
   
 
 
-  const onPageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+  const onPageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);
   };
  

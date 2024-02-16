@@ -8,7 +8,7 @@ type DashTitleProps = {
 
 const DashTitle:React.FC<DashTitleProps> = ({title}) => {
   const location = useLocation()
-  const path = location.pathname.split('/').filter((item, i) => i !== 0)
+  const path = location.pathname.split('/').filter((_item, i) => i !== 0)
 
   return (
     <div className='flex justify-between flex-wrap items-center py-3 px-4 rounded mr-5 ml-4 lg:ml-0 my-3 bg-bgGray'>

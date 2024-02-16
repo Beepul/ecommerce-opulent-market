@@ -26,11 +26,11 @@ export const authApi = baseApi.injectEndpoints({
         }),
         autoLogin: builder.query({
             query: () => '/auth/auto-login',
-            forceRefetch({currentArg,previousArg}){
+            forceRefetch({currentArg,previousArg: _}){
                 return currentArg
             },
             providesTags: ['AutoLogin'],
-            async onQueryStarted(arg,{dispatch, queryFulfilled}){
+            async onQueryStarted(_arg,{dispatch, queryFulfilled}){
                 try {
                     const {data} = await queryFulfilled
                     dispatch(setCredentials(data.user))
@@ -45,7 +45,7 @@ export const authApi = baseApi.injectEndpoints({
                 method: 'POST',
             }),
             invalidatesTags :[{type: 'AutoLogin'}],
-            async onQueryStarted(arg,{dispatch, queryFulfilled}){
+            async onQueryStarted(_arg,{dispatch, queryFulfilled}){
                 try {
                     await queryFulfilled
                     dispatch(logOutUser())
@@ -61,7 +61,7 @@ export const authApi = baseApi.injectEndpoints({
                 method: 'PUT',
                 body: data
             }),
-            async onQueryStarted(arg, {dispatch, queryFulfilled}){
+            async onQueryStarted(_arg, {dispatch, queryFulfilled}){
                 try {
                     const {data} = await queryFulfilled
                     console.log('From API', data)
@@ -78,7 +78,7 @@ export const authApi = baseApi.injectEndpoints({
                 method: 'PUT',
                 body: data
             }),
-            async onQueryStarted(arg, {dispatch, queryFulfilled}){
+            async onQueryStarted(_arg, {dispatch, queryFulfilled}){
                 try {
                     const {data} = await queryFulfilled
                     dispatch(setCredentials(data.user))

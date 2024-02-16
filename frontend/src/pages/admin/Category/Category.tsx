@@ -1,4 +1,3 @@
-import React from 'react'
 import DashTitle from '../DashTitle'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import { useDeleteCategoryMutation, useGetAllCategoryQuery } from '../../../redux/services/categoryApi'

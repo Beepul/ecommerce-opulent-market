@@ -1,4 +1,4 @@
-import { Box, Modal, Typography } from '@mui/material'
+import { Box, Modal } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { Order } from '../../../type/order';
 import SubmitButton from '../../../components/SubmitButton';
@@ -7,8 +7,6 @@ import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { RxCross2 } from "react-icons/rx";
-import { useSelector } from 'react-redux';
-import { RootState } from '../../../redux/store';
 import { useUpdateAddressMutation } from '../../../redux/services/addressApi';
 import { ResponseError } from '../../../type/error';
 import { toast } from 'react-toastify';
@@ -256,11 +254,11 @@ const EditOrder:React.FC<EditOrderProps> = ({open,handleClose,order}) => {
                   </p>
                   <div className='flex items-center justify-between gap-3'>
                       <div className='flex flex-1 items-center gap-1'>
-                        <input type="radio" id='cash' name='pm' checked={paymentMethod === 'cash' && true} onChange={(e) => setPaymentMethod('cash')} />
+                        <input type="radio" id='cash' name='pm' checked={paymentMethod === 'cash' && true} onChange={() => setPaymentMethod('cash')} />
                         <label htmlFor="cash" className='text-[15px]'>Cash</label>
                       </div>
                       <div className='flex flex-1 items-center gap-1 '>
-                        <input type="radio" id='online' name='pm' checked={paymentMethod === 'online' && true} onChange={(e) => setPaymentMethod('online')} />
+                        <input type="radio" id='online' name='pm' checked={paymentMethod === 'online' && true} onChange={() => setPaymentMethod('online')} />
                         <label htmlFor="online" className='text-[15px]'>Online</label>
                       </div>
                   </div>

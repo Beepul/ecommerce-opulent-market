@@ -37,7 +37,7 @@ const Orders = () => {
 
   
   const {data, isLoading, isError} = useGetAllOrdersQuery('')
-  const [deleteOrder, {isLoading: deleting}] = useDeleteOrderMutation()
+  const [deleteOrder] = useDeleteOrderMutation()
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -168,7 +168,7 @@ const Orders = () => {
       },
     },
     {field: 'shippingAmt', headerName: 'Shipping Price', width: 130,
-      valueGetter(params) {
+      valueGetter(_params) {
         return '$20'
       },
     },

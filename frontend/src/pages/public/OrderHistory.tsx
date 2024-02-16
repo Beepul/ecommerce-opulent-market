@@ -1,4 +1,3 @@
-import React from 'react'
 import ProfileSidebar from '../../components/profile/ProfileSidebar'
 import { useGetAllOrdersQuery } from '../../redux/services/orderApi'
 import { useSelector } from 'react-redux'
@@ -7,7 +6,6 @@ import Loader from '../../components/Loader'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
 import { Button } from '@mui/material'
 import { AiOutlineEye } from 'react-icons/ai'
-import { FiEdit } from 'react-icons/fi'
 import { Order } from '../../type/order'
 import { useNavigate } from 'react-router-dom'
 import { Product } from '../../type/product'
@@ -19,16 +17,6 @@ type ItemType = {
   _id: string;
 }
 
-const style = {
-  position: 'absolute' as 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  bgcolor: 'background.paper',
-  borderRadius: '4px',
-  boxShadow: 24,
-  p: 4,
-};
 
 const OrderHistory = () => {
   const user = useSelector((state: RootState) => state.auth.user)
@@ -130,7 +118,7 @@ const OrderHistory = () => {
       },
     },
     {field: 'shippingAmt', headerName: 'Shipping Price', width: 130,
-      valueGetter(params) {
+      valueGetter(_params) {
         return '$20'
       },
     },
