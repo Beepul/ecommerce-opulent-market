@@ -35,11 +35,13 @@ const CreateProduct = () => {
   const {isLoading:_catLoading ,data: catData} = useGetAllCategoryQuery('')
 
   const {id} = useParams()
-  const {productToEdit}:{productToEdit: Product} = useGetProductsQuery('productList',{
+  const {productToEdit}:{productToEdit: Product} = useGetProductsQuery({},{
     selectFromResult: ({data}) => ({
       productToEdit:data?.products?.find((p: Product) => p._id === id)
     })
   })
+
+  // console.log({productToEdit})
 
   const [updateProduct, {isLoading: updateLoading}] = useUpdateProductMutation()
 

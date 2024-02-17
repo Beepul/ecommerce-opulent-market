@@ -37,12 +37,15 @@ const baseQueryWithReauth = async (args:string | FetchArgs,api: BaseQueryApi,ext
             result = await baseQuery(args,api,extraOptions)
         }else{
             if(refreshResult.error?.status === 403){
+                // console.log('403, start')
+                api.dispatch(logOutUser())
+                // console.log('403, redux state cleared')
                 await baseQuery({
                     url: '/auth/logout',
                     method: 'POST',
                     body: {}
                 },api,extraOptions)
-                api.dispatch(logOutUser())
+                // console.log('403,Cookie cleared')
             }
             return refreshResult
         }

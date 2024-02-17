@@ -107,7 +107,7 @@ const SingleProduct = () => {
             <strong className='mr-2'>Category:</strong>
             {
               data.product.category.map((c:Category,i: number) => (
-                <span key={i} className='capitalize'>{c.name}</span>
+                <span key={i} className="capitalize mr-2">{c.name}</span>
               ) )
             }
           </div>

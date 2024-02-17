@@ -26,6 +26,7 @@ const Products = () => {
 
   const [productList,setProductList] = useState<DataGridProduct[]>([])
   const {data,isLoading:getProductsLoading,isError} = useGetProductsQuery({})
+  
 
   const [deleteProduct,{isLoading:deleteLoading}] = useDeleteProductMutation()
 
