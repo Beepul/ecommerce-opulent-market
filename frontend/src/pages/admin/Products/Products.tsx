@@ -8,7 +8,6 @@ import { AiOutlineDelete, AiOutlineEye } from 'react-icons/ai';
 import { FiEdit } from "react-icons/fi";
 import { useDeleteProductMutation, useGetProductsQuery } from '../../../redux/services/productApi';
 import { Product } from '../../../type/product';
-import Loader from '../../../components/Loader';
 import { ResponseError } from '../../../type/error';
 import { toast } from 'react-toastify';
 
