@@ -106,12 +106,14 @@ stripeRoute.post('/create-checkout-session', async (req, res) => {
 
 stripeWebhookRoute.post('/', express.raw({type: 'application/json'}), (request, response) => {
   const sig = request.headers['stripe-signature'];
+  console.log({sig})
+  console.log(request)
 
   let event;
 
   try {
     event = stripe.webhooks.constructEvent(request.body, sig, process.env.STRIPE_ENDPOINT_SK_KEY);
-    // console.log('Webhook Event::', event)
+    console.log('Webhook Event::', event)
   } catch (err) {
     console.log(`Webhook Error:: ${err.message}`)
     response.status(400).send(`Webhook Error: ${err.message}`);
