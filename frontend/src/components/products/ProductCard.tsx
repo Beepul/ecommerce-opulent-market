@@ -43,10 +43,10 @@ const ProductCard:React.FC<ProductCardProps> = ({product}) => {
             {product.images.length > 1 ? (
                 <>
                     <span className='absolute h-full w-full inline-block hover:opacity-0 opacity-100 transition-all duration-500'>
-                        <LazyLoadImage src={product.images[0].url} alt={product.name} effect='blur' height={'100%'} width={'100%'} className='max-h-full h-full object-cover'/>
+                        <LazyLoadImage src={product.images[product.images.length - 1].url} alt={product.name} effect='blur' height={'100%'} width={'100%'} className='max-h-full h-full object-cover'/>
                     </span>
                     <span className='absolute h-full w-full inline-block opacity-0 hover:opacity-100 transition-all duration-500'>
-                        <LazyLoadImage src={product.images[1].url} alt={product.name} effect='blur' height={'100%'} width={'100%'}  className='max-h-full h-full object-cover' />
+                        <LazyLoadImage src={product.images[product.images.length - 2].url} alt={product.name} effect='blur' height={'100%'} width={'100%'}  className='max-h-full h-full object-cover' />
                     </span>
                 </>
             ): (

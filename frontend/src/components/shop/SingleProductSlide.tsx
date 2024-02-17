@@ -18,7 +18,7 @@ const SingleProductSlide: React.FC<SingleProductSlideProps> = ({images}) => {
 
   useEffect(() => {
     if(images){
-      setImageTOShow(images[0].url)
+      setImageTOShow(images[images.length - 1].url)
     }
   },[images])
 
@@ -29,7 +29,7 @@ const SingleProductSlide: React.FC<SingleProductSlideProps> = ({images}) => {
       </div>
       <div className='flex gap-6 pt-6 flex-wrap'>
         {
-          images.map((img,i) => (
+          [...images].reverse().map((img,i) => (
             <div key={i} onClick={() =>setImageTOShow(img.url)}>
               <img src={img.url} alt=""  className='lg:h-[140px] h-[100px] w-full object-cover lg:object-contain cursor-pointer' />
             </div>

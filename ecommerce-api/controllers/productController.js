@@ -11,10 +11,11 @@ const BError = require('../utils/error')
 const getAllProducts = asyncHandler(async (req,res) => {
     let query = {}
 
+    const page = parseInt(req.query.page) || 0;
+    const perPage = parseInt(req.query.perPage) || 3;
+    const skip = page * perPage;
 
-    const page = parseInt(req.query.page) || 1;
-    const perPage = parseInt(req.query.perPage) || 5;
-    const skip = (page - 1) * perPage;
+    
 
     // filtering by category
     if(req.query.category){

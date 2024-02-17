@@ -30,7 +30,7 @@ const Home = () => {
 
   
 
-  const {offerProducts, offerLoading} = useGetProductsQuery({},{
+  const {offerProducts: _, offerLoading} = useGetProductsQuery({},{
     selectFromResult: ({data,isLoading}) => {
       const offerProducts = data?.products?.filter((p: Product) => p.offer.isOffered)
       return {
@@ -40,7 +40,7 @@ const Home = () => {
     }
   })
 
-  console.log(offerProducts)
+  // console.log(offerProducts)
 
   const offProd = [
     {

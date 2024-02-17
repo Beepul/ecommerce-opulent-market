@@ -17,7 +17,7 @@ type RequestDataType = {
 }
 
 
-let productsPerPage = 3
+let productsPerPage = 6
 
 const initialState = {
   category: [],
@@ -25,14 +25,14 @@ const initialState = {
   minPrice: null,
   maxPrice: null,
   sortBy: '',
-  page: 1,
+  page: 0,
   perPage: productsPerPage,
 }
 
 const Shop = () => {
 
   const [totalPage,setTotalPage] = useState(1)
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [requestData,setRequestData] = useState<RequestDataType>(initialState)
   const [selectedCat,setSelectedCat] = useState<string[]>([])
   const [ratingValue, setRatingValue] = React.useState<number | null>(null);
@@ -41,6 +41,8 @@ const Shop = () => {
 
   const [searchParams] = useSearchParams()
 
+
+  // console.log(requestData)
   const {data:pData,isLoading:pLoading,refetch} = useGetProductsQuery(requestData)
 
 
@@ -51,6 +53,7 @@ const Shop = () => {
 
   useEffect(() => {
     setRequestData({
+      ...requestData,
       category: selectedCat,
       rating: ratingValue,
       search: searchParams.get('search'),
@@ -60,6 +63,7 @@ const Shop = () => {
   },[selectedCat,ratingValue,searchParams,page])
 
   useEffect(() => {
+    // console.log({requestData})
     refetch()
   },[requestData])
 
@@ -78,7 +82,9 @@ const Shop = () => {
 
 
   const onPageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
-    setPage(value);
+    // console.log(_event)
+    // console.log(value - 1)
+    setPage(value - 1);
   };
  
 
@@ -122,7 +128,7 @@ const Shop = () => {
           {
             totalPage > 1 && (
               <section className='flex justify-center mb-12'>
-                <Pagination count={totalPage} page={page} onChange={onPageChange} />
+                <Pagination count={totalPage} page={page + 1} onChange={onPageChange} />
               </section>
             )
           }

@@ -61,7 +61,8 @@ const ShopSideBar:React.FC<ShopSideBarProps> = ({
   };
 
   const filterbyPrice = () => {
-    setRequestData({...requestData,minPrice: priceRange[0],maxPrice: priceRange[1],page: 1} )
+    setPage(0)
+    setRequestData({...requestData,minPrice: priceRange[0],maxPrice: priceRange[1],page: 0} )
   }
 
   const resetFilters = () => {
@@ -71,7 +72,7 @@ const ShopSideBar:React.FC<ShopSideBarProps> = ({
       rating: null,
       minPrice: null,
       maxPrice: null,
-      page: 1,
+      page: 0,
       perPage: productsPerPage
     })
   }
@@ -93,7 +94,7 @@ const ShopSideBar:React.FC<ShopSideBarProps> = ({
             <li key={`category-${i}`} 
             onClick={()=> {
               setSelectedCat([cat._id])
-              setPage(1)
+              setPage(0)
             }}
             className=' border-b-[1px] py-3 border-[#ccc] cursor-pointer hover:bg-bgGray hover:pl-4 hover:text-primary transition-all duration-300 capitalize'>{cat.name}</li>
           ))}
@@ -106,7 +107,7 @@ const ShopSideBar:React.FC<ShopSideBarProps> = ({
           value={ratingValue}
           color='yellow'
           onChange={(_, newValue) => {
-            setPage(1)
+            setPage(0)
             setRatingValue(newValue);
           }}
         />

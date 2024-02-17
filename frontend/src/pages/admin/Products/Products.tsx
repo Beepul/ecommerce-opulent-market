@@ -23,9 +23,19 @@ type DataGridProduct = {
 }
 
 const Products = () => {
-
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 5,
+  });
+  
   const [productList,setProductList] = useState<DataGridProduct[]>([])
-  const {data,isLoading:getProductsLoading,isError} = useGetProductsQuery({})
+  const {data,isLoading:getProductsLoading,refetch} = useGetProductsQuery({
+    page: paginationModel.page || 0, perPage: paginationModel.pageSize || 5
+  })
+
+  const [rowCountState, setRowCountState] = useState(
+    data?.count || 0,
+  );
   
 
   const [deleteProduct,{isLoading:deleteLoading}] = useDeleteProductMutation()
@@ -146,33 +156,35 @@ const Products = () => {
    
   ];
 
+  useEffect(() => {
+    refetch()
+  },[paginationModel])
+
+  useEffect(() => {
+    setRowCountState((prevCount: number) =>
+      data?.count !== undefined ? data?.count : prevCount,
+    );
+  }, [data?.count, setRowCountState]);
+
+  // console.log({paginationModel})
+
 
   return (
     <section className='max-w-[100%]'>
       <DashTitle title='Prodcuts' />
-      {
-        getProductsLoading ? (
-          <div className='min-h-[300px] flex flex-col items-center justify-center'>
-            <Loader />
-          </div>
-        ) : isError ? (
-          <div className='min-h-[300px] flex flex-col items-center justify-center'><p className='text-lg font-semibold capitalize'>Opps! Something Went Wrong</p></div>
-        ) : (
-          <div style={{height: 400, width: '100%'}} className='lg:pr-5 px-4 lg:pl-0'>
-            <DataGrid
-              rows={productList}
-              columns={columns}
-              initialState={{
-                pagination: {
-                  paginationModel: { page: 0, pageSize: 5 },
-                },
-              }}
-              pageSizeOptions={[5, 10]}
-              disableRowSelectionOnClick
-            />
-          </div>
-        )
-      }
+        <div style={{height: 400, width: '100%'}} className='lg:pr-5 px-4 lg:pl-0'>
+          <DataGrid
+            rows={productList}
+            columns={columns}
+            loading={getProductsLoading}
+            rowCount={rowCountState}
+            disableRowSelectionOnClick
+            pageSizeOptions={[5,10]}
+            paginationModel={paginationModel}
+            paginationMode="server"
+            onPaginationModelChange={setPaginationModel}
+          />
+        </div>
     </section>
   )
 }
