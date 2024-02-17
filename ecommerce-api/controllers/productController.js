@@ -15,7 +15,9 @@ const getAllProducts = asyncHandler(async (req,res) => {
     const perPage = parseInt(req.query.perPage) || 3;
     const skip = page * perPage;
 
-    
+    if(req.query.isOffered){
+        query["offer.isOffered"] = req.query.isOffered
+    }
 
     // filtering by category
     if(req.query.category){

@@ -11,7 +11,7 @@ export const productApi = baseApi.injectEndpoints({
             invalidatesTags: [{type: 'Product'},{type: 'Category'}]
         }),
         getProducts: builder.query({
-            query: ({ category, rating, minPrice, maxPrice, sortBy, search, page, perPage }) => {
+            query: ({ category, rating, minPrice, maxPrice, sortBy, search, page, perPage, isOffered }) => {
                 // console.log({page,perPage})
                 const params = new URLSearchParams();
         
@@ -35,6 +35,10 @@ export const productApi = baseApi.injectEndpoints({
                 if((page >= 0) && perPage){
                     params.append('page', page)
                     params.append('perPage', perPage)
+                }
+
+                if(isOffered) {
+                    params.append('isOffered', isOffered)
                 }
         
                 const queryString = params.toString();
