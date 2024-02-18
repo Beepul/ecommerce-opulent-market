@@ -88,6 +88,8 @@ const createOrder = asyncHandler(async (req, res) => {
         if(!address){
             throw new BError('Invalid shipping address',400)
         }
+
+        // console.log(items)
     
         await validateProductStock(items,res);
     

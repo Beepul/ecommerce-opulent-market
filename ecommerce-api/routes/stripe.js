@@ -3,6 +3,10 @@ const Stripe = require('stripe')
 const Order = require('../models/orderModel')
 const Address = require('../models/addressModel')
 const Transaction = require('../models/transactionModel')
+const User = require('../models/userModel')
+const { sendEmail } = require('../utils/mailer')
+const Product = require('../models/productModel')
+const BError = require('../utils/error')
 
 require('dotenv').config()
 
@@ -15,7 +19,7 @@ const stripeWebhookRoute = express.Router()
 stripeRoute.post('/create-checkout-session', async (req, res) => {
   try {
     const {cart,userId,address} = req.body
-    // console.log(cart)
+    // console.log("Cart ::",cart)
     // console.log("Address::",address)
   
     if(!cart || cart.length <= 0){
@@ -23,6 +27,14 @@ stripeRoute.post('/create-checkout-session', async (req, res) => {
         message: "There must be at lease one item in the cart"
       })
     }
+
+    for (const item of cart) {
+      if (item.quantity <= 0) {
+          throw new BError('Please increase the quantity of the product to purchase',400);
+      }
+    }
+
+    await validateProductStock(cart,res);
 
     const customer = await stripe.customers.create({
       metadata: {
@@ -106,15 +118,15 @@ stripeRoute.post('/create-checkout-session', async (req, res) => {
 
 stripeWebhookRoute.post('/', express.raw({type: 'application/json'}), (request, response) => {
   const sig = request.headers['stripe-signature'];
-  console.log({sig})
-  console.log("RAW BODY FROM STRING:: ", request.body)
-  console.log("STRIPE ENDPOINT SK KEY:: ",process.env.STRIPE_ENDPOINT_SK_KEY)
+  // console.log({sig})
+  // console.log("RAW BODY FROM STRING:: ", request.body)
+  // console.log("STRIPE ENDPOINT SK KEY:: ",process.env.STRIPE_ENDPOINT_SK_KEY)
 
   let event;
 
   try {
     event = stripe.webhooks.constructEvent(request.body, sig, process.env.STRIPE_ENDPOINT_SK_KEY);
-    console.log('Webhook Event::', event)
+    // console.log('Webhook Event::', event)
   } catch (err) {
     console.log(`Webhook Error:: ${err.message}`)
     response.status(400).send(`Webhook Error: ${err.message}`);
@@ -127,8 +139,18 @@ stripeWebhookRoute.post('/', express.raw({type: 'application/json'}), (request, 
       const data = event.data.object;
       stripe.customers.retrieve(data.customer).then( async (customer) => {
         const {cart,userId,address} = customer.metadata
+
+        // console.log(userId)
         // console.log({cart,userId,address});
         // console.log("data::", data);
+
+        const user = await User.findById(userId)
+
+        const addressExist = await Address.find({user: userId})
+
+        if(addressExist.length >=1 || addressExist){
+          await Address.deleteMany({user: userId})
+      }
 
         // Create Address
         let addressData = JSON.parse(address)
@@ -175,7 +197,21 @@ stripeWebhookRoute.post('/', express.raw({type: 'application/json'}), (request, 
 
         console.log("Transaction Created")
 
-      }).catch(err => console.log(err.message));
+        sendEmail({
+          email: user.email,
+          subject: 'Seven Shop Purchase Confirm',
+          message: `
+              <h2>Hello ${user.name}</h2>
+              <p>Thank you for choosing us. Your product will be on the way soon.</p>
+          `
+        })
+
+        await updateProductStock(JSON.parse(cart));
+
+      }).catch(err => {
+        console.log(err.message)
+        throw new BError(err.message || 'Payment failed', 500)
+      });
       break;
     default:
       console.log(`Unhandled event type ${event.type}`);
@@ -185,6 +221,24 @@ stripeWebhookRoute.post('/', express.raw({type: 'application/json'}), (request, 
   response.send().end();
 });
 
+
+const validateProductStock = async (items,res) => {
+  for (const item of items) {
+      const product = await Product.findById(item._id);
+
+      if (!product || product.stockQuantity < item.quantity) {
+          throw new BError(`Insufficient stock for ${product.name}`, 400);
+      }
+  }
+};
+
+const updateProductStock = async (items) => {
+  for (const item of items) {
+      const product = await Product.findById(item._id);
+      product.stockQuantity -= item.quantity;
+      await product.save();
+  }
+};
 
 
 module.exports = {stripeRoute,stripeWebhookRoute}

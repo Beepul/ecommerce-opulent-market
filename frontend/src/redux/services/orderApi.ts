@@ -8,7 +8,7 @@ const orderApi = baseApi.injectEndpoints({
                 url: '/stripe/create-checkout-session',
                 body: data
             }),
-            invalidatesTags: [{type: 'Order'}]
+            invalidatesTags: [{type: 'Order'},{type: 'Stats'}]
         }),
         getAllOrders: builder.query({
             query: ({user}) => {
@@ -29,7 +29,7 @@ const orderApi = baseApi.injectEndpoints({
                 method: 'DELETE',
                 url: `/orders/${id}`
             }),
-            invalidatesTags: [{type: 'Order'}]
+            invalidatesTags: [{type: 'Order'},{type: 'Stats'}]
         }),
         createOrder: builder.mutation({
             query: (data) => ({
@@ -37,7 +37,7 @@ const orderApi = baseApi.injectEndpoints({
                 method: 'POST',
                 body: data
             }),
-            invalidatesTags: [{type: 'Order'},{type: 'Product'}]
+            invalidatesTags: [{type: 'Order'},{type: 'Product'},{type: 'Stats'}]
         }),
         updateOrder: builder.mutation({
             query: (data) => ({
@@ -45,7 +45,7 @@ const orderApi = baseApi.injectEndpoints({
                 method: 'PUT',
                 body: data
             }),
-            invalidatesTags: [{type: 'Order'}]
+            invalidatesTags: [{type: 'Order'},{type: 'Stats'}]
         })
     })
 })
