@@ -1,7 +1,6 @@
 const asyncHandler = require('express-async-handler')
 const Product = require('../models/productModel')
 const Review = require('../models/reviewModel')
-const User = require('../models/userModel')
 const Order = require('../models/orderModel')
 const BError = require('../utils/error')
 

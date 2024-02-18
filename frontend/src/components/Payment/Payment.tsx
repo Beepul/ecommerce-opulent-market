@@ -10,6 +10,8 @@ import { ResponseError } from '../../type/error'
 import { useCreateOrderMutation } from '../../redux/services/orderApi'
 import { useNavigate } from 'react-router-dom'
 
+
+
 const Payment = () => {
   const [paymentMethod, setPaymentMethod] = useState('')
   const user = useSelector((state : RootState) => state.auth.user)
@@ -65,6 +67,8 @@ const Payment = () => {
     }
 
   }
+
+  
   return (
     <div>
       <h2 className='text-xl font-semibold text-center mb-12'>Conform All Information Before Proceeding</h2>
@@ -167,10 +171,10 @@ const Payment = () => {
       </div>
       {
         paymentMethod && (
-          <div className='flex justify-center mb-16'>
+          <div className='flex flex-col items-center justify-center mb-16'>
             {
               paymentMethod === 'online' ? <PayButton cart={cart} address={address}/> : 
-              <button disabled={addressLoading || orderLoading} onClick={handleManualCheckout} className='btn-primary w-full px-4 md:w-auto disabled:cursor-not-allowed disabled:opacity-[1]'>
+              <button disabled={addressLoading || orderLoading} onClick={handleManualCheckout} className='btn-primary w-full px-4 md:w-fit disabled:cursor-not-allowed disabled:opacity-[1]'>
                 {(addressLoading || orderLoading) ? (
                   <Lottie
                     animationData={animationData}

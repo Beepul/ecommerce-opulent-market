@@ -1,7 +1,6 @@
 const asyncHandler = require('express-async-handler')
 const Product = require('../models/productModel')
 const Category = require('../models/categoryModel');
-const {imageUploader, getImagePublicId, deleteImageFromCloudinary} = require('../utils/cloudinary');
 const cloudinary = require('cloudinary')
 const BError = require('../utils/error')
 

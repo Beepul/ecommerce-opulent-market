@@ -161,7 +161,7 @@ const OrderHistory = () => {
       <aside className='min-w-[250px]'>
         <ProfileSidebar active={2} />
       </aside>
-      <main className='flex-1 max-w-[calc(100%-250px-36px)]'>
+      <main className='flex-1 md:max-w-[calc(100%-250px-36px)] mb-16'>
         {
           isLoading ? (
             <div className='min-h-[300px] flex flex-col items-center justify-center'>
@@ -170,7 +170,7 @@ const OrderHistory = () => {
           ) : isError ? (
             <div className='min-h-[300px] flex flex-col items-center justify-center'><p className='text-lg font-semibold capitalize'>Opps! Something Went Wrong</p></div>
           ) : (
-            <div style={{ height: 400, width: '100%' }} className="lg:pr-5 px-4 lg:pl-0">
+            <div style={{ height: 400, width: '100%' }} className="lg:pr-5 md:px-4 lg:pl-0 p-0">
               <h2 className='mb-6 font-semibold text-xl'>Order History</h2>
               <DataGrid
                 rows={data.orders}

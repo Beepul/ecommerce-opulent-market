@@ -2,7 +2,6 @@ const asyncHandler = require('express-async-handler')
 const Category = require('../models/categoryModel')
 const cloudinary = require('cloudinary')
 const Product = require('../models/productModel');
-const { deleteImageFromCloudinary } = require('../utils/cloudinary');
 const BError = require('../utils/error');
 
 // GET ALL CATEGORY
