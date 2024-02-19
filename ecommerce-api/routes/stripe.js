@@ -146,12 +146,6 @@ stripeWebhookRoute.post('/', express.raw({type: 'application/json'}), (request, 
 
         const user = await User.findById(userId)
 
-        const addressExist = await Address.find({user: userId})
-
-        if(addressExist.length >=1 || addressExist){
-          await Address.deleteMany({user: userId})
-      }
-
         // Create Address
         let addressData = JSON.parse(address)
         addressData.user = userId

@@ -23,7 +23,6 @@ const PayButton:React.FC<PayBUttonProps> = ({cart,address}) => {
     const user = useSelector((state: RootState) => state.auth.user)
     const [checkout,{isLoading}] = useCheckoutMutation()
 
-    // console.log(address)
 
     const handleCheckout = async () => {
         try {

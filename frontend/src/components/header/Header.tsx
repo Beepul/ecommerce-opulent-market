@@ -4,16 +4,8 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 
 const Header = () => {
-  // const [active, setActive] = useState(false);
   const user = useSelector((state: RootState) => state.auth.user)
 
-  // window.addEventListener("scroll", () => {
-  //   if (window.scrollY > 70) {
-  //     setActive(true);
-  //   } else {
-  //     setActive(false);
-  //   }
-  // });
   
   return (
     <header>

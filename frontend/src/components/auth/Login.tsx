@@ -53,7 +53,6 @@ const Login = () => {
         });
         navigate(from)
     } catch (error) {
-        // console.log("error",error)
         const resErr = error as ResponseError
         toast.error(resErr?.data?.message, {
             position: "top-right"

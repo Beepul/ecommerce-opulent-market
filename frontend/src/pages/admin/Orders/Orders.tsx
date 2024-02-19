@@ -31,36 +31,12 @@ const style = {
 };
 
 const Orders = () => {
-  const [open, setOpen] = React.useState(false);
-  const [openDelete, setOpenDelete] = React.useState(false);
-
-
-  
   const {data, isLoading, isError} = useGetAllOrdersQuery('')
   const [deleteOrder] = useDeleteOrderMutation()
 
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-
-  const handleOpenDelete = () => setOpenDelete(true);
-  const handleCloseDelete = () => setOpenDelete(false);
 
   const navigate = useNavigate()
 
-  const handleDeleteOrder = async (id:string) => {
-    try {
-      const result = await deleteOrder(id).unwrap()
-      if('error' in result){
-        toast.error('Cannot Delete This Order')
-        return
-      }
-      handleCloseDelete()
-      toast.success('Order deleted Successfully')
-    } catch (error) {
-      const resErr = error as ResponseError
-      toast.error(resErr.data?.message || 'Cannot Delete Order')
-    }
-  } 
 
 	const columns: GridColDef[] = [
     {field: 'name', headerName: 'Name', width: 180,
@@ -198,6 +174,10 @@ const Orders = () => {
       width: 90,
       sortable: false,
       renderCell: (params) => {
+        const [open, setOpen] = React.useState(false);
+
+        const handleOpen = () => setOpen(true);
+        const handleClose = () => setOpen(false);
         return (
           <>
             <Button
@@ -216,11 +196,27 @@ const Orders = () => {
       width: 90,
       sortable: false,
       renderCell: (params) => {
-
+        const [openDelete, setOpenDelete] = React.useState(false);
+        const handleOpenDelete = () => setOpenDelete(true);
+        const handleCloseDelete = () => setOpenDelete(false);
+        const handleDeleteOrder = async (id:string) => {
+          try {
+            const result = await deleteOrder(id).unwrap()
+            if('error' in result){
+              toast.error('Cannot Delete This Order')
+              return
+            }
+            handleCloseDelete()
+            toast.success('Order deleted Successfully')
+          } catch (error) {
+            const resErr = error as ResponseError
+            toast.error(resErr.data?.message || 'Cannot Delete Order')
+          }
+        } 
         return (
           <>
-            <Button onClick={() => handleOpenDelete()} >
-              <AiOutlineDelete size={20} />
+            <Button onClick={handleOpenDelete} >
+              <AiOutlineDelete size={20} /> 
             </Button>
             <Modal
               open={openDelete}
@@ -234,7 +230,7 @@ const Orders = () => {
                   <p className='text-[15px] mb-4'>Are Your Sure?</p>
                   <div className='flex gap-4 justify-center'>
                     <button 
-                      onClick={() => handleDeleteOrder(params.id as string)}
+                      onClick={() => handleDeleteOrder(params.row._id)}
                       className='bg-red-600 text-white py-2 px-8 rounded-md hover:opacity-70 transition-all duration-500'>Delete</button>
                     <button 
                       onClick={handleCloseDelete}

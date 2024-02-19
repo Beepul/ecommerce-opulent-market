@@ -24,6 +24,7 @@ const Shop = lazy(() => import("./pages/public/Shop"))
 const LoginRegister = lazy(() => import("./pages/public/LoginRegister")) 
 const ActivateUser = lazy(() => import("./pages/public/ActivateUser")) 
 
+const OrderDetails = lazy(() => import('./pages/public/OrderDetails'));
 const Profile = lazy(() => import("./pages/public/Profile")) 
 const Dashboard = lazy(() => import("./pages/admin/Dashboard/Dashboard")) 
 const CreateProduct = lazy(() => import("./pages/admin/Products/CreateProduct")) 
@@ -102,6 +103,7 @@ function App() {
               <Route path="/activation/:activationToken" element={<ActivateUser />} />
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
               <Route path="/order-history" element={<ProtectedRoute><OrderHistory /></ProtectedRoute>} />
+              <Route path="/order-history/:id" element={<ProtectedRoute><OrderDetails /></ProtectedRoute>} />
               <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
               <Route path="/payment" element={<ProtectedRoute><PaymentPage /></ProtectedRoute>} />
               <Route path="/checkout-success" element={<ProtectedRoute><SuccessPage /></ProtectedRoute>} />

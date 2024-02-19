@@ -7,7 +7,6 @@ type ShopProductListProps = {
 }
 
 const ShopProductList:React.FC<ShopProductListProps> = ({products}) => {
-  // console.log(products)
   return (
     <>
       {products?.length <= 0 ? (

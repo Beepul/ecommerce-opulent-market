@@ -143,7 +143,7 @@ const OrderHistory = () => {
       renderCell: (params) => {
         return (
           <>
-              <Button onClick={() => navigate(`/dashboard/order/${params.id}`)}>
+              <Button onClick={() => navigate(`/order-history/${params.id}`)}>
                 <AiOutlineEye size={20} />
               </Button>
           </>

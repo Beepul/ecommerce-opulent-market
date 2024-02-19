@@ -165,7 +165,6 @@ const Products = () => {
     );
   }, [data?.count, setRowCountState]);
 
-  // console.log({paginationModel})
 
 
   return (

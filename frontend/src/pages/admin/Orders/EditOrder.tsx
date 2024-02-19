@@ -84,7 +84,6 @@ const EditOrder:React.FC<EditOrderProps> = ({open,handleClose,order}) => {
       postalCode,
       country
     }
-    console.log(addressData)
     try {
       const result = await updateAddress(addressData).unwrap()
       console.log("Address",result)
@@ -111,7 +110,7 @@ const EditOrder:React.FC<EditOrderProps> = ({open,handleClose,order}) => {
       },
       deliveredAt: orderStatus === 'delivered' ? date : null
     }
-    console.log(orderData)
+
     try {
       const result = await updateOrder(orderData).unwrap()
       console.log("Order",result)

@@ -23,7 +23,6 @@ const Checkout = () => {
   const cart = useSelector((state: RootState) => state.cart)
   const address = useSelector((state: RootState) => state.order.addressInfo)
 
-  // console.log(address)
 
   const dispatch = useDispatch()
   const navigate = useNavigate()

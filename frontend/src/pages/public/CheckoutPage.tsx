@@ -21,7 +21,6 @@ const CheckoutPage = () => {
     <div className='container'>
       <CheckoutSteps active={1} />
       <Checkout />
-      {/* <PayButton cart={cart}/> */}
     </div>
   )
 }

@@ -36,7 +36,7 @@ const Transaction = () => {
       field: 'order_details', headerName: 'Order Details', width: 130,
       renderCell: (params) => {
         return (
-          <button onClick={()=> navigate(`/dashboard/order/${params.row._id}`)}><AiOutlineEye className="text-lg"/></button>
+          <button onClick={()=> navigate(`/dashboard/order/${params.row.order}`)}><AiOutlineEye className="text-lg"/></button>
         )
       } 
     }

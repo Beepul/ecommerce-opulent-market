@@ -41,7 +41,6 @@ const CreateProduct = () => {
     })
   })
 
-  // console.log({productToEdit})
 
   const [updateProduct, {isLoading: updateLoading}] = useUpdateProductMutation()
 

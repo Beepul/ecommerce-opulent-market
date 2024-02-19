@@ -3,6 +3,7 @@ import { Product } from '../type/product';
 import dayjs from 'dayjs';
 import {LazyLoadImage} from 'react-lazy-load-image-component'
 import { Link } from 'react-router-dom';
+import 'react-lazy-load-image-component/src/effects/blur.css';
 
 const OfferCounter = ({ product }: { 
   product: Product ;
@@ -62,7 +63,7 @@ const OfferCounter = ({ product }: {
               </div>
             </div>
             <div className='bg-gray-300 h-fit'>
-              <LazyLoadImage src={product.images[product.images.length - 1].url} className='md:w-[305px] w-full' />
+              <LazyLoadImage src={product.images[product.images.length - 1].url} effect='blur' className='md:w-[305px] w-full' />
               <div className='py-6'>
                 <h3 className='text-3xl font-semibold capitalize text-center text-white'>
                   <Link to={`/product/${product._id}`}>{product.name}</Link>

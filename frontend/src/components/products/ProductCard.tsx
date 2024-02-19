@@ -24,8 +24,6 @@ const ProductCard:React.FC<ProductCardProps> = ({product}) => {
         const discountedPrice = Number(price) * discountDecimal;
 
         const afterDiscountPrice = Number(price) - Number(discountedPrice)
-
-        // console.log({price,discount,discountedPrice,afterDiscountPrice})
     
         return afterDiscountPrice
       }

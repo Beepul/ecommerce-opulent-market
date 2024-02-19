@@ -19,7 +19,6 @@ const AccountSetting = () => {
   const [updatePassword, {isLoading: passLoading}] =  useUpdatePasswordMutation()
   const [forgotPassword, {isLoading: forgetPassLoading}] = useForgotPasswordMutation()
 
-  // console.log(user)
 
 
   const handleSubmit = async (e: React.FormEvent) => {

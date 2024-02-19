@@ -10,7 +10,7 @@ type SubmitButtonProps = {
 const SubmitButton: React.FC<SubmitButtonProps> = ({isLoading,title}) => {
   return (
     <>
-        <button type='submit' disabled={isLoading} className='btn-primary px-4 w-full px-4 md:w-auto disabled:cursor-not-allowed disabled:opacity-[1]'>
+        <button type='submit' disabled={isLoading} className='btn-primary px-4 w-full md:w-auto disabled:cursor-not-allowed disabled:opacity-[1]'>
             {isLoading ? (
               <Lottie
                 animationData={animationData}

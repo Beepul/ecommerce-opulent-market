@@ -26,7 +26,6 @@ const DashHeader = () => {
   })
   const user = useSelector((state: RootState) => state.auth.user)
 
-  // console.log(user)
   const [logoutUser] = useLogoutUserMutation()
 
   const dispatch = useDispatch()

@@ -40,8 +40,6 @@ const HeaderBottom = () => {
 
   const cartState = useSelector((state: RootState) => state.cart)
 
-//   console.log("CartState::",cartState)
-
 	const location = useLocation();
 
 	const user = useSelector((state:RootState) => state.auth.user)
@@ -99,7 +97,7 @@ const HeaderBottom = () => {
 					))}
 					
 					{
-						(user && user?.role !== 'admin') && (
+						user && (
 							<ListItem disablePadding className='border-b-[1px] border-[#ccc]'>
 								<ListItemButton>
 									<ListItemText >
@@ -165,7 +163,7 @@ const HeaderBottom = () => {
 								cartState.cart.map((c,i) =>(
 									<li key={i}>
 										<div className='flex p-4'>
-											<img src={c.images[0].url} alt={c.name} className='h-[110px] w-[90px] object-cover' />
+											<img src={c.images[c.images.length - 1].url} alt={c.name} className='h-[110px] w-[90px] object-cover' />
 											<div className='pl-4 pr-4 w-full relative'>
 												<h4 className='font-semibold mb-1'>{c.name}</h4>
 												<p className='flex items-center gap-1 '><span className='text-gray-500 text-[14px]'>{c.quantity}</span><RxCross2 className="text-[14px] stroke-gray-500 pt-[2px]" /><span className='font-semibold text-[14px]'>{c.afterDiscountPrice}</span></p>

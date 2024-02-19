@@ -9,7 +9,6 @@ type BestSellingProductsProps = {
 }
 
 const BestSellingProducts:React.FC<BestSellingProductsProps> = ({products}) => {
-  // console.log(products)
 
   const navigate = useNavigate()
 

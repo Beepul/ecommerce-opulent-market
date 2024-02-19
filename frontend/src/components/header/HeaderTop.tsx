@@ -61,7 +61,7 @@ const HeaderTop:React.FC<HeaderTopProps> = ({user}) => {
             </span>
             <ul className="lg:flex items-center hidden">
               {
-                (user && user?.role !== 'admin') && (
+                user && (
                   <li>
                     <Link to={'/profile'} className="flex text-[13px] items-center gap-1 py-1 px-3 rounded transition-all duration-300 hover:bg-[#c5c5c56a] hover:text-primary">
                       <CgProfile className="text-base "/>

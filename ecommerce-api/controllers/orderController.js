@@ -4,6 +4,8 @@ const Order = require('../models/orderModel')
 const Product = require('../models/productModel');
 const User = require('../models/userModel');
 const BError = require('../utils/error');
+const Transaction = require('../models/transactionModel');
+const { sendEmail } = require('../utils/mailer');
 
 
 
@@ -89,6 +91,8 @@ const createOrder = asyncHandler(async (req, res) => {
             throw new BError('Invalid shipping address',400)
         }
 
+        const existUser = await User.findById(user)
+
         // console.log(items)
     
         await validateProductStock(items,res);
@@ -111,6 +115,16 @@ const createOrder = asyncHandler(async (req, res) => {
         })
     
         await updateProductStock(items);
+
+        sendEmail({
+            email: existUser.email,
+            subject: 'Seven Shop Purchase Confirm',
+            message: `
+                <h2>Hello ${existUser.name}</h2>
+                <p>Thank you for choosing us. Your product will be on the way soon.</p>
+                <p>Your total amount is $${totalPrice} </p>
+            `
+        })
         
         res.status(201).json({
             message: 'success',
@@ -132,13 +146,23 @@ const updateOrder = asyncHandler(async (req,res) => {
         let order = await Order.findById(id)
     
         if(!order){
-            res.status(400)
-            throw new BError('Order does not exist')
+            throw new BError('Order does not exist',400)
         }
     
         if(order.user.toString() !== existUser._id.toString()){
-            res.status(400)
-            throw new BError(`This order does not belogs to user you've provided `)
+            throw new BError(`This order does not belogs to user you've provided `,400)
+        }
+
+        if(status === 'delivered' && paymentDetails?.paymentStatus === 'paid' && order.paymentDetails.paymentMethod === 'cash'){
+            await Transaction.create({
+                user,
+                order: order._id,
+                amount_subtotal: Number(order.totalPrice) - 20,
+                shipping_cost: 20,
+                amount: order.totalPrice,
+                payment_status: 'paid',
+                paidAt: Date.now(),
+            })
         }
         
         order.status = status || order.status

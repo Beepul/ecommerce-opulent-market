@@ -13,21 +13,10 @@ type ProtectedRouteProps = {
   }
 };
 
-// type ResData = {
-//     user: User
-// }
 
 const AdminRoute: React.FC<ProtectedRouteProps> = ({ children,data ,user,isLoading,isError }) => {
-//   const user = useSelector((state: RootState) => state.auth.user);
 
   const location = useLocation()
-
-//   const { data, isLoading,isError } = useAutoLoginQuery('');
-
-    // console.log('Data:', data);
-    // const resData = data as ResData
-    // console.log('Loading:', isLoading);
-    // console.log('Error:', isError);
 
 
     if(!user){
@@ -52,8 +41,6 @@ const AdminRoute: React.FC<ProtectedRouteProps> = ({ children,data ,user,isLoadi
             return <Navigate to='/' state={{from: location}} replace />
         }
     }
-
-    // console.log("Data",resData)
     
 
     return <>{children}</>

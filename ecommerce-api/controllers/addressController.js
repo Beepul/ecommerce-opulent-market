@@ -69,11 +69,6 @@ const createUserAddress = asyncHandler(async (req,res) => {
             throw new BError('User does not exist',400)
         }
     
-        const addressExist = await Address.find({user: userId})
-    
-        if(addressExist.length >=1 || addressExist){
-            await Address.deleteMany({user: userId})
-        }
     
         const address = await Address.create({
             user: user._id,

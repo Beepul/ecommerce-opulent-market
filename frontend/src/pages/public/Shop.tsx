@@ -42,7 +42,6 @@ const Shop = () => {
   const [searchParams] = useSearchParams()
 
 
-  // console.log(requestData)
   const {data:pData,isLoading:pLoading,refetch} = useGetProductsQuery(requestData)
 
 
@@ -63,7 +62,6 @@ const Shop = () => {
   },[selectedCat,ratingValue,searchParams,page])
 
   useEffect(() => {
-    // console.log({requestData})
     refetch()
   },[requestData])
 
@@ -82,8 +80,6 @@ const Shop = () => {
 
 
   const onPageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
-    // console.log(_event)
-    // console.log(value - 1)
     setPage(value - 1);
   };
  

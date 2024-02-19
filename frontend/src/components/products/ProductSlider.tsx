@@ -4,8 +4,6 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import ProductCard from './ProductCard';
 
-// Install Swiper modules
-// SwiperCore.use([Navigation]);
 
 type ProductSliderProps = {
   products: Product[];
