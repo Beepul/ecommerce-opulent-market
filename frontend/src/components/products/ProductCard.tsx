@@ -38,6 +38,7 @@ const ProductCard:React.FC<ProductCardProps> = ({product}) => {
   return (
     <div>
         <div className='relative h-[320px]'>
+            <Link to={`/product/${product._id}`}>
             {product.images.length > 1 ? (
                 <>
                     <span className='absolute h-full w-full inline-block hover:opacity-0 opacity-100 transition-all duration-500'>
@@ -52,18 +53,19 @@ const ProductCard:React.FC<ProductCardProps> = ({product}) => {
                     <LazyLoadImage src={product.images[0].url} alt={product.name} effect='blur' height={'100%'} width={'100%'} className='max-h-full h-full object-cover'/>
                 </span>
             )}
+            </Link>
             <span 
             onClick={handleAddToCart}
             className='absolute bottom-3 right-3 z-20 bg-white flex items-center justify-center w-9 h-9 rounded-full cursor-pointer group shadow-xl'>
                 <FiShoppingCart className="group-hover:scale-[1.2] group-hover:stroke-primary transition-all duration-500" />
             </span>
         </div>
+        <Link to={`/product/${product._id}`}>
         <div className='py-4'>
-            <Link to={`/product/${product._id}`}>
+            
                 <h5 className='text-base font-semibold capitalize'>
                     {product.name}
                 </h5>
-            </Link>
             <div className='mb-2'>
                 {
                 (product.discountPercentage === null || product.discountPercentage <= 0) ? (
@@ -78,6 +80,7 @@ const ProductCard:React.FC<ProductCardProps> = ({product}) => {
             </div>
             <Rating name="read-only" value={product.averageRating} readOnly />
         </div>
+        </Link>
     </div>
   )
 }
