@@ -4,8 +4,9 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "npm server.js",
     "dev": "nodemon server.js",
+    "alive": "pm2 start server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -25,6 +26,7 @@
     "mongoose": "^8.0.0",
     "morgan": "^1.10.0",
     "nodemailer": "^6.9.7",
+    "pm2": "^5.3.1",
     "stripe": "^14.13.0"
   }
 }
