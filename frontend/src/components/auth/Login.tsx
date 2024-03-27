@@ -102,7 +102,17 @@ const Login = () => {
                   </span>
               </div>
           </div>
-          <Link to={'/login/forgot-password'} className='text-blue-500 border-b border-blue-500 text-sm mb-4'>Forgot Passowrd?</Link>
+          <div>
+            <Link to={'/login/forgot-password'} className='text-blue-500 border-b border-blue-500 text-sm mb-4  hover:text-primary hover:opacity-90 hover:border-primary transition-all duration-300'>Forgot Passoword?</Link>
+            <span 
+                onClick={() => {
+                    setFormData({
+                        email: 'rootsbeer@susuu.me',
+                        password: 'rootsbeer'
+                    })
+                }}
+                className='text-blue-500 border-b border-blue-500 text-sm mb-4 ml-4 cursor-pointer hover:text-primary hover:opacity-90 hover:border-primary transition-all duration-300'>Get started with guest user/admin account?</span>
+          </div>
           <div className='flex items-center gap-8 pt-4 flex-wrap'>
             <SubmitButton isLoading={isLoading} title='Login' />
             {/* <button type='button' className='btn-primary cursor-pointer w-full px-4 md:w-auto items-center gap-2' onClick={() => loginG()}>Login With Google </button> */}
